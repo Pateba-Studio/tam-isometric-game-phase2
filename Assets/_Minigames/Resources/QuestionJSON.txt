@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "data": [
+    {
+      "id": 184,
+      "sub_master_value": "Stage 1",
+      "type": "point",
+      "game_type": "Runnerman",
+      "media": null,
+      "audio": null,
+      "media_type": null,
+      "question_type": "1 soal 2 jawaban",
+      "question": "[test pertanyaan]",
+      "answers": [
+        {
+          "id": 525,
+          "answer": "A",
+          "point": 0
+        },
+        {
+          "id": 526,
+          "answer": "B",
+          "point": 0
+        }
+      ]
+    }
+  ]
+}
