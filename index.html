@@ -76,58 +76,71 @@
       }
 
       loadingBar.style.display = "block";
-
+      
       // Define the unityInstance variable
-    let unityInstance = null;
-        
-    // Function to save data to local storage
-    function saveToLocalStorage(key, value) {
-      localStorage.setItem(key, value);
-    }
-    
-    // Function to load data from local storage
-    function loadFromLocalStorage(key) {
-      return localStorage.getItem(key) || "";
-    }
-    
-    // Function to remove data from local storage
-    function removeFromLocalStorage(key) {
-      localStorage.removeItem(key);
-    }
-    
-    // Function to clear all data from local storage
-    function clearLocalStorage() {
-      localStorage.clear();
-    }
-    
-    // Function to load data from local storage and send it to Unity
-    function getFromLocalStorage(key, gameObjectName, callbackMethod) {
-      if (unityInstance !== null) {
-        var value = loadFromLocalStorage(key);
-        unityInstance.SendMessage(gameObjectName, callbackMethod, value);
-      } else {
-        console.error("Unity instance is not yet initialized.");
+      let unityInstance = null;
+
+      // Default player data
+      const defaultPlayerData = {
+        "email": "youremail@gmail.com",
+        "ticket": "AED8FAA8",
+        "sub_master_value_id": "40",
+        "language": "id"
+      };
+
+      // Function to save data to local storage
+      function saveToLocalStorage(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
       }
-    }
-    
-    // Script initialization for Unity
-    var script = document.createElement("script");
-    script.src = loaderUrl;
-    script.onload = () => {
-      createUnityInstance(canvas, config, (progress) => {
-        progressBarFull.style.width = 100 * progress + "%";
-      }).then((instance) => {
-        unityInstance = instance; // Assign the initialized instance
-        loadingBar.style.display = "none";
-        fullscreenButton.onclick = () => {
-          unityInstance.SetFullscreen(1);
-        };
-      }).catch((message) => {
-        alert(message);
-      });
-    };
-    
-    document.body.appendChild(script);
+
+      // Function to load data from local storage
+      function loadFromLocalStorage(key) {
+        const storedValue = localStorage.getItem(key);
+        return storedValue ? JSON.parse(storedValue) : null;
+      }
+
+      // Initialize default data if not already present in localStorage
+      function initializePlayerData() {
+        const existingData = loadFromLocalStorage('playerData');
+        if (!existingData) {
+          saveToLocalStorage('playerData', defaultPlayerData);
+        }
+      }
+
+      // Function to load data from local storage and send it to Unity
+      function getFromLocalStorage(key, gameObjectName, callbackMethod) {
+        if (unityInstance !== null) {
+          var value = loadFromLocalStorage(key);
+          if (value) {
+            unityInstance.SendMessage(gameObjectName, callbackMethod, JSON.stringify(value));
+          }
+        } else {
+          console.error("Unity instance is not yet initialized.");
+        }
+      }
+
+      // Script initialization for Unity
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+        }).then((instance) => {
+          unityInstance = instance; // Assign the initialized instance
+          loadingBar.style.display = "none";
+          fullscreenButton.onclick = () => {
+            unityInstance.SetFullscreen(1);
+          };
+
+          // Initialize default player data in localStorage if not set
+          initializePlayerData();
+
+        }).catch((message) => {
+          alert(message);
+        });
+      };
+
+      document.body.appendChild(script);
     </script>
   </body>
 </html>
