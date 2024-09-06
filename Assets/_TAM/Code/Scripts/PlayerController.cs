@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (!DataHandler.instance.isPlaying) return;
         float moveInputX = Input.GetAxisRaw("Horizontal") + variableJoystick.Horizontal;
         float moveInputY = Input.GetAxisRaw("Vertical") + variableJoystick.Vertical;
 
