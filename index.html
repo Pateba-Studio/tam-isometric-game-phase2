@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>TAM Assessment Game Phase 2</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+  </head>
+  <body>
+    <div id="unity-container" style="width: 100%; height: 100%;">
+      <canvas id="unity-canvas" width="auto" height="auto" tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"></div>
+      <div id="unity-footer">
+        <div id="unity-webgl-logo"></div>
+        <div id="unity-fullscreen-button"></div>
+        <div id="unity-build-title">TAM Assessment Game Phase 2</div>
+      </div>
+    </div>
+
+    <script>
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      var warningBanner = document.querySelector("#unity-warning");
+
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function() {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/tam-2024.loader.js";
+      var config = {
+        dataUrl: buildUrl + "/tam-2024.data.unityweb",
+        frameworkUrl: buildUrl + "/tam-2024.framework.js.unityweb",
+        codeUrl: buildUrl + "/tam-2024.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "TAM",
+        productName: "Assessment Game Phase 2",
+        productVersion: "1.0.0",
+        showBanner: unityShowBanner,
+      };
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+        container.className = "unity-mobile";
+        canvas.className = "unity-mobile";
+      } else {
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+      }
+
+      loadingBar.style.display = "block";
+
+      // Define the unityInstance variable
+    let unityInstance = null;
+        
+    // Function to save data to local storage
+    function saveToLocalStorage(key, value) {
+      localStorage.setItem(key, value);
+    }
+    
+    // Function to load data from local storage
+    function loadFromLocalStorage(key) {
+      return localStorage.getItem(key) || "";
+    }
+    
+    // Function to remove data from local storage
+    function removeFromLocalStorage(key) {
+      localStorage.removeItem(key);
+    }
+    
+    // Function to clear all data from local storage
+    function clearLocalStorage() {
+      localStorage.clear();
+    }
+    
+    // Function to load data from local storage and send it to Unity
+    function getFromLocalStorage(key, gameObjectName, callbackMethod) {
+      if (unityInstance !== null) {
+        var value = loadFromLocalStorage(key);
+        unityInstance.SendMessage(gameObjectName, callbackMethod, value);
+      } else {
+        console.error("Unity instance is not yet initialized.");
+      }
+    }
+    
+    // Script initialization for Unity
+    var script = document.createElement("script");
+    script.src = loaderUrl;
+    script.onload = () => {
+      createUnityInstance(canvas, config, (progress) => {
+        progressBarFull.style.width = 100 * progress + "%";
+      }).then((instance) => {
+        unityInstance = instance; // Assign the initialized instance
+        loadingBar.style.display = "none";
+        fullscreenButton.onclick = () => {
+          unityInstance.SetFullscreen(1);
+        };
+      }).catch((message) => {
+        alert(message);
+      });
+    };
+    
+    document.body.appendChild(script);
+    </script>
+  </body>
+</html>
