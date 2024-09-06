@@ -12,7 +12,14 @@
 
         // Function to redirect based on device type
         function redirectToSite(sitePath) {
-            const baseURL = window.location.origin + window.location.pathname.replace(/\/$/, ""); // Adaptive base URL
+            let baseURL = window.location.origin + window.location.pathname;
+            
+            // Ensure the path does not end with a slash
+            if (baseURL.endsWith('/')) {
+                baseURL = baseURL.slice(0, -1);
+            }
+            
+            // Perform the redirection
             window.location.href = baseURL + sitePath;
         }
 
