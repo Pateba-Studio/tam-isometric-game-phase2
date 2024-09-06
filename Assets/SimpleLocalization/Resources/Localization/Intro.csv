@@ -2,3 +2,6 @@ Key,id-ID,en-US
 CharSelection.Title,Pilih Karakter Yang Ingin Dimainkan,Select Character You Want To Play
 CharSelection.Submit,Pakai Karakter,Use This Character
 VisitedBooth.Title,Booth Yang Dikunjungi,Visited Booth
+Dialogue.Button.Video,Putar Video Intro,Play Intro Video
+Dialogue.Button.Tutorial,Lihat Tutorial,View Tutorial
+Dialogue.Button.Game,Mainkan Minigame,Play Minigames

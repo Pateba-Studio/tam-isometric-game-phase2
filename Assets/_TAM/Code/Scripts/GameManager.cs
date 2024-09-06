@@ -7,6 +7,7 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
 using System.Text.RegularExpressions;
+using Assets.SimpleLocalization.Scripts;
 
 [Serializable]
 public class CharacterModelData
@@ -27,11 +28,19 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
-    [Header("User Interface")]
+    [Header("General UI")]
     public Button interactButton;
     public GameObject loadingPanel;
     public GameObject gameCanvas;
     public GameObject charSelectionPanel;
+
+    [Header("Dialogue Box")]
+    public GameObject dialoguePanel;
+    public TextMeshProUGUI dialogueTitleText;
+    public TextMeshProUGUI dialogueContentText;
+    public List<Button> dialogueButtons;
+    public List<Image> charImages;
+    public List<Sprite> charSprites;
 
     [Header("Data List")]
     public List<MasterValueHandlerData> masterValueHandlers;
@@ -106,6 +115,33 @@ public class GameManager : MonoBehaviour
         DataHandler.instance.isPlaying = true;
         charSelectionPanel.SetActive(false);
         gameCanvas.SetActive(true);
+    }
+    #endregion
+
+    #region Dialogue System
+    public void SetDialoguePanel(DialogueData data)
+    {
+        dialogueButtons.ForEach(button => {
+            if (data.isReceptionist) button.gameObject.SetActive(true);
+            else button.gameObject.SetActive(false);
+        });
+
+        charImages[0].sprite = charSprites.Find(sprite => sprite.name.Contains(data.NPCCharKey));
+        charImages[1].sprite = charSprites[currentCharIndex];
+
+        switch (LocalizationManager.Language)
+        {
+            case "en-US":
+                dialogueTitleText.text = data.titleEn;
+                dialogueContentText.text = data.contentEn[0];
+                break;
+            case "id-ID":
+                dialogueTitleText.text = data.titleId;
+                dialogueContentText.text = data.contentId[0];
+                break;
+        }
+
+        dialoguePanel.SetActive(true);
     }
     #endregion
 }
