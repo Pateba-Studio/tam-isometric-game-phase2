@@ -106,7 +106,7 @@
 
         videoPlayer.onended = function() {
           videoPlayer.style.display = 'none';
-          unityInstance.SendMessage("VideoController", "OnVideoEnd");
+          unityInstance.SendMessage("Importance", "OnVideoEnd");
         };
       }
 
