@@ -109,9 +109,11 @@
         videoPlayer.load();  // Reload the video element
         videoPlayer.play();  // Play the video
 
-        // Disable video player when video ends
+        // Disable video player when video ends and notify Unity
         videoPlayer.onended = function() {
           videoPlayer.style.display = 'none';  // Hide the video player
+          // Notify Unity that the video has ended
+          unityInstance.SendMessage("VideoController", "OnVideoEnd");
         };
       }
 
