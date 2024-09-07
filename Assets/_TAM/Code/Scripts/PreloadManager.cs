@@ -39,6 +39,7 @@ public class PreloadManager : MonoBehaviour
             json, res =>
             {
                 DataHandler.instance.masterValue = JsonUtility.FromJson<MasterValue>(res);
+
                 foreach (var handler in GameManager.instance.masterValueHandlers)
                 {
                     StartCoroutine(handler.masterValueHandler.InitAllBoothValue(

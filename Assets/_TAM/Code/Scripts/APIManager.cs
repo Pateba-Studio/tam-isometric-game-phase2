@@ -12,6 +12,7 @@ public class APIManager : MonoBehaviour
     [Header("Basic URL")]
     [SerializeField] string rootUrl = "https://tamconnect.com/api";
     [SerializeField] string getMasterValue = "roleplay/master-value";
+    [SerializeField] string getMasterValueIntro = "roleplay/get-master-value-intro";
     [SerializeField] string getSubMasterValue = "roleplay/sub-master-value";
     [SerializeField] string getBooth = "roleplay/booths";
     [SerializeField] string getQuestionByBooth = "roleplay/get-questions";
@@ -23,6 +24,7 @@ public class APIManager : MonoBehaviour
     }
 
     public string SetupMasterValue() => string.Format("{0}/{1}", rootUrl, getMasterValue);
+    public string SetupMasterValueIntro() => string.Format("{0}/{1}", rootUrl, getMasterValueIntro);
     public string SetupSubMasterValue() => string.Format("{0}/{1}", rootUrl, getSubMasterValue);
     public string SetupBooth() => string.Format("{0}/{1}", rootUrl, getBooth);
     public string SetupQuestionByBooth() => string.Format("{0}/{1}", rootUrl, getQuestionByBooth);

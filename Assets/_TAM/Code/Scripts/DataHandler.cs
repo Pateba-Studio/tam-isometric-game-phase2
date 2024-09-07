@@ -40,6 +40,23 @@ public class MasterValue
 }
 #endregion
 
+#region MasterValueIntro
+[Serializable]
+public class MasterValueIntroData
+{
+    public int master_value_id;
+    public string video;
+}
+
+[Serializable]
+public class MasterValueIntro
+{
+    public bool success;
+    public string message;
+    public MasterValueIntroData intro;
+}
+#endregion
+
 public class DataHandler : MonoBehaviour
 {
     public static DataHandler instance;

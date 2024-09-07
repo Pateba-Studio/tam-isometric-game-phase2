@@ -1,31 +1,50 @@
 using UnityEngine;
+using UnityEngine.Events;
+using System.Collections;
 
 public class VideoController : MonoBehaviour
 {
     public static VideoController instance;
     public bool isDone;
 
+    private UnityAction onVideoEndCallback;
+
     private void Awake()
     {
-        instance = this;    
+        instance = this;
+    }
+
+    public void PlayVideo(string videoUrl, UnityAction onVideoEnd = null)
+    {
+        onVideoEndCallback = onVideoEnd;
+
+        Debug.Log("Trying Play: " + videoUrl);
+        Application.ExternalCall("playVideoFromUnity", videoUrl);
+
+        StartCoroutine(CheckForVideoEnd());
+        StartCoroutine(AfterSeconds(.5f));
     }
 
     public void OnVideoEnd()
     {
-        Debug.Log("Video has ended, triggered from HTML!");
         isDone = true;
     }
 
-    public void PlayVideo(string videoUrl)
+    private IEnumerator AfterSeconds(float second)
     {
-        Application.ExternalCall("showVideoPlayer", videoUrl);
-#if UNITY_EDITOR
-        isDone = true;
-#endif
+        yield return new WaitForSeconds(second);
+        onVideoEndCallback?.Invoke();
+        isDone = false;
     }
 
-    public void ShowVideoAlbum(string[] videoUrl)
+    private IEnumerator CheckForVideoEnd()
     {
-        Application.ExternalCall("showVideoPlayer", videoUrl);
+        while (!isDone)
+        {
+            yield return null;
+        }
+
+        onVideoEndCallback?.Invoke();
+        isDone = false;
     }
 }

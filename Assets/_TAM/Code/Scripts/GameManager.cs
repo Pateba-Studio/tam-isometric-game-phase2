@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Text.RegularExpressions;
 using Assets.SimpleLocalization.Scripts;
+using System.Reflection;
 
 [Serializable]
 public class CharacterModelData
@@ -24,15 +25,26 @@ public class MasterValueHandlerData
     public bool isDone;
 }
 
+[Serializable]
+public class AnswerButtonData
+{
+    public GameObject unselectedBG;
+    public GameObject selectedBG;
+    [Space]
+    public TextMeshProUGUI unselectedText;
+    public TextMeshProUGUI selectedText;
+}
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
     [Header("General UI")]
     public Button interactButton;
-    public GameObject loadingPanel;
     public GameObject gameCanvas;
     public GameObject charSelectionPanel;
+    public GameObject loadingPanel;
+    public List<TextMeshProUGUI> loadingText;
 
     [Header("Dialogue Box")]
     public GameObject dialoguePanel;
@@ -42,10 +54,22 @@ public class GameManager : MonoBehaviour
     public List<Image> charImages;
     public List<Sprite> charSprites;
 
+    [Header("Question Panel")]
+    public GameObject questionPanel;
+    public TextMeshProUGUI questionText;
+    public List<AnswerButtonData> answerButtons;
+
     [Header("Data List")]
     public List<MasterValueHandlerData> masterValueHandlers;
     public List<CharacterModelData> charModels;
+
+    int currentGameIndex;
+    int currentAnswerIndex;
     int currentCharIndex;
+    int currentDialogueIndex;
+    HallBoothData currentHallBoothData;
+    List<RoleplayQuestion> currentRoleplayQuestions;
+    Question currentQuestion;
 
     private void Awake()
     {
@@ -54,7 +78,7 @@ public class GameManager : MonoBehaviour
 
     public void SetLoadingText(string text)
     {
-        foreach (var tmp in loadingPanel.GetComponentsInChildren<TextMeshProUGUI>())
+        foreach (var tmp in loadingText)
         {
             var match = Regex.Match(tmp.text, @"\.{1,3}$");
             tmp.text = match.Success ? text + match.Value : text;
@@ -118,30 +142,174 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
-    #region Dialogue System
-    public void SetDialoguePanel(DialogueData data)
+    #region Hall & Booth System
+    public void SetDialogue(bool finalDialogue)
     {
-        dialogueButtons.ForEach(button => {
-            if (data.isReceptionist) button.gameObject.SetActive(true);
-            else button.gameObject.SetActive(false);
-        });
-
-        charImages[0].sprite = charSprites.Find(sprite => sprite.name.Contains(data.NPCCharKey));
+        charImages[0].sprite = charSprites.Find(sprite => sprite.name.Contains(currentHallBoothData.NPCCharKey));
         charImages[1].sprite = charSprites[currentCharIndex];
 
         switch (LocalizationManager.Language)
         {
             case "en-US":
-                dialogueTitleText.text = data.titleEn;
-                dialogueContentText.text = data.contentEn[0];
+                dialogueTitleText.text = currentHallBoothData.titleEn;
+                dialogueContentText.text = finalDialogue ? currentHallBoothData.finalContentEn : 
+                    currentHallBoothData.contentEn[currentDialogueIndex];
                 break;
             case "id-ID":
-                dialogueTitleText.text = data.titleId;
-                dialogueContentText.text = data.contentId[0];
+                dialogueTitleText.text = currentHallBoothData.titleId;
+                dialogueContentText.text = finalDialogue ? currentHallBoothData.finalContentId : 
+                    currentHallBoothData.contentId[currentDialogueIndex];
                 break;
+        }
+    }
+
+    public void NextDialogue()
+    {
+        if (currentDialogueIndex + 1 >= currentHallBoothData.contentId.Count + 1) return;
+
+        currentDialogueIndex++;
+        SetupBooth(null, false);
+    }
+    
+    public void CloseDialogue()
+    {
+        dialoguePanel.SetActive(false);
+        gameCanvas.SetActive(true);
+        currentDialogueIndex = 0;
+    }
+
+    public void SetupBooth(HallBoothData data, bool reset)
+    {
+        if (reset) currentDialogueIndex = 0;
+        if (data != null) currentHallBoothData = data;
+
+        dialogueButtons.ForEach(button =>
+        {
+            button.onClick.RemoveAllListeners();
+            if (currentDialogueIndex == currentHallBoothData.contentId.Count)
+                button.gameObject.SetActive(true);
+            else
+                button.gameObject.SetActive(false);
+        });
+
+        if (currentDialogueIndex == currentHallBoothData.contentId.Count)
+        {
+            SetDialogue(true);
+            dialogueButtons[0].onClick.AddListener(() =>
+            {
+                string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
+                              $"\"master_value_id\":{currentHallBoothData.masterValueId}}}";
+
+                SetLoadingText("Getting Video");
+                loadingPanel.SetActive(true);
+                StartCoroutine(APIManager.instance.PostDataCoroutine(
+                    APIManager.instance.SetupMasterValueIntro(),
+                    json, res =>
+                    {
+                        MasterValueIntro intro = JsonUtility.FromJson<MasterValueIntro>(res);
+                        VideoController.instance.PlayVideo(intro.intro.video);
+                        loadingPanel.SetActive(false);
+                    }));
+            });
+        }
+        else if (currentDialogueIndex < currentHallBoothData.contentId.Count)
+        {
+            SetDialogue(false);
         }
 
         dialoguePanel.SetActive(true);
+        gameCanvas.SetActive(false);
+    }
+    #endregion
+
+    #region Game
+    public void SetupRoleplay(HallBoothData data)
+    {
+        currentGameIndex = 0;
+        currentRoleplayQuestions = new List<RoleplayQuestion>();
+        MasterValueHandler handler = new MasterValueHandler();
+        
+        foreach (var item in instance.masterValueHandlers)
+        {
+            if (item.masterValueHandler.masterValueData.id == data.masterValueId)
+            {
+                handler = item.masterValueHandler;
+                break;
+            }
+        }
+
+        foreach (var booth in handler.booth.booths)
+        {
+            foreach (var item in booth.question.roleplay_questions)
+            {
+                currentRoleplayQuestions.Add(item);
+            }
+        }
+
+        SetupGame();
+    }
+
+    public void SetupGame()
+    {
+        if (currentGameIndex == currentRoleplayQuestions.Count)
+        {
+            questionPanel.SetActive(false);
+            return;
+        }
+
+        switch(currentRoleplayQuestions[currentGameIndex].type)
+        {
+            case "video":
+                VideoController.instance.PlayVideo(
+                    currentRoleplayQuestions[currentGameIndex].video_path,
+                    SetupGame
+                    );
+                break;
+            case "game_question":
+                currentQuestion = currentRoleplayQuestions[currentGameIndex].question;
+                SetupQuestion();
+                break;
+        }
+
+        currentGameIndex++;
+    }
+
+    public void SetupQuestion()
+    {
+        questionPanel.SetActive(true);
+        questionText.text = currentQuestion.question;
+        
+        for (int i = 0; i < answerButtons.Count; i++)
+        {
+            answerButtons[i].selectedBG.SetActive(false);
+            answerButtons[i].unselectedBG.SetActive(true);
+            answerButtons[i].unselectedText.text = answerButtons[i].selectedText.text = 
+                currentQuestion.answers[i].answer;
+        }
+
+        ChooseAnswer(0);
+    }
+
+    public void ChooseAnswer(int index)
+    {
+        currentAnswerIndex = index;
+        for (int i = 0; i < answerButtons.Count; i++)
+        {
+            answerButtons[i].selectedBG.SetActive(false);
+            answerButtons[i].unselectedBG.SetActive(true);
+
+            if (i == index) 
+            { 
+                answerButtons[i].selectedBG.SetActive(true); 
+                answerButtons[i].unselectedBG.SetActive(false); 
+            }
+        }
+    }
+
+    public void SubmitAnswer()
+    {
+        questionPanel.SetActive(false);
+        SetupGame();
     }
     #endregion
 }

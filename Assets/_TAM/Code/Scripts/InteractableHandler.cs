@@ -5,7 +5,10 @@ using UnityEngine.Events;
 
 public class InteractableHandler : MonoBehaviour
 {
-    public DialogueData dialogueData;
+    public bool isHall;
+    public bool isBooth;
+    public bool isOnlyGame;
+    public HallBoothData hallBoothData;
     [HideInInspector] public UnityEvent whenInteract;
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -13,7 +16,12 @@ public class InteractableHandler : MonoBehaviour
         if (collision.CompareTag("Player"))
         {
             whenInteract.RemoveAllListeners();
-            whenInteract.AddListener(() => GameManager.instance.SetDialoguePanel(dialogueData));
+            whenInteract.AddListener(() =>
+            {
+                if (isBooth) GameManager.instance.SetupBooth(hallBoothData, true);
+                if (isOnlyGame) GameManager.instance.SetupRoleplay(hallBoothData);
+            });
+
             GameManager.instance.SetupInteractButton(true, whenInteract);
         }
     }
