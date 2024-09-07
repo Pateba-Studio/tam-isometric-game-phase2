@@ -7,16 +7,15 @@
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <style>
-      /* Ensure the video player is on top of the Unity canvas */
       #videoPlayer {
-        position: fixed; /* Fullscreen */
+        position: fixed;
         top: 0;
         left: 0;
-        width: 100vw; /* Full viewport width */
-        height: 100vh; /* Full viewport height */
-        z-index: 1000; /* Higher than Unity canvas */
-        display: none; /* Initially hidden */
-        background-color: black; /* Optional: background to cover the content */
+        width: 100vw;
+        height: 100vh;
+        z-index: 1000;
+        display: none;
+        background-color: black;
       }
     </style>
   </head>
@@ -37,7 +36,6 @@
       </div>
     </div>
 
-    <!-- Video player that will appear on top of the Unity canvas -->
     <video id="videoPlayer" controls>
       <source id="videoSource" src="" type="video/mp4">
       Your browser does not support the video tag.
@@ -95,29 +93,23 @@
       }
 
       loadingBar.style.display = "block";
-
-      // Define the unityInstance variable
       let unityInstance = null;
 
-      // Function to play the video from Unity and make it fullscreen
       function playVideoFromUnity(videoUrl) {
         const videoPlayer = document.getElementById('videoPlayer');
         const videoSource = document.getElementById('videoSource');
         
-        videoSource.src = videoUrl;  // Set the video URL
-        videoPlayer.style.display = 'block';  // Show the video player
-        videoPlayer.load();  // Reload the video element
-        videoPlayer.play();  // Play the video
+        videoSource.src = videoUrl;
+        videoPlayer.style.display = 'block';
+        videoPlayer.load();
+        videoPlayer.play();
 
-        // Disable video player when video ends and notify Unity
         videoPlayer.onended = function() {
-          videoPlayer.style.display = 'none';  // Hide the video player
-          // Notify Unity that the video has ended
+          videoPlayer.style.display = 'none';
           unityInstance.SendMessage("VideoController", "OnVideoEnd");
         };
       }
 
-      // Default player data
       const defaultPlayerData = {
         "email": "youremail@gmail.com",
         "ticket": "AED8FAA8",
@@ -125,18 +117,15 @@
         "language": "id"
       };
 
-      // Function to save data to local storage
       function saveToLocalStorage(key, value) {
         localStorage.setItem(key, JSON.stringify(value));
       }
 
-      // Function to load data from local storage
       function loadFromLocalStorage(key) {
         const storedValue = localStorage.getItem(key);
         return storedValue ? JSON.parse(storedValue) : null;
       }
 
-      // Initialize default data if not already present in localStorage
       function initializePlayerData() {
         const existingData = loadFromLocalStorage('playerData');
         if (!existingData) {
@@ -144,7 +133,6 @@
         }
       }
 
-      // Function to load data from local storage and send it to Unity
       function getFromLocalStorage(key, gameObjectName, callbackMethod) {
         if (unityInstance !== null) {
           var value = loadFromLocalStorage(key);
@@ -156,20 +144,18 @@
         }
       }
 
-      // Script initialization for Unity
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
         }).then((instance) => {
-          unityInstance = instance; // Assign the initialized instance
+          unityInstance = instance;
           loadingBar.style.display = "none";
           fullscreenButton.onclick = () => {
             unityInstance.SetFullscreen(1);
           };
 
-          // Initialize default player data in localStorage if not set
           initializePlayerData();
 
         }).catch((message) => {
