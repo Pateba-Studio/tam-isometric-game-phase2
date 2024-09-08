@@ -58,6 +58,7 @@ public class GameManager : MonoBehaviour
     public GameObject questionPanel;
     public TextMeshProUGUI questionText;
     public List<AnswerButtonData> answerButtons;
+    public List<RoleplayQuestion> currentRoleplayQuestions;
 
     [Header("Data List")]
     public List<MasterValueHandlerData> masterValueHandlers;
@@ -68,7 +69,6 @@ public class GameManager : MonoBehaviour
     int currentCharIndex;
     int currentDialogueIndex;
     HallBoothData currentHallBoothData;
-    List<RoleplayQuestion> currentRoleplayQuestions;
     Question currentQuestion;
 
     private void Awake()
@@ -206,8 +206,8 @@ public class GameManager : MonoBehaviour
                     APIManager.instance.SetupMasterValueIntro(),
                     json, res =>
                     {
-                        MasterValueIntro intro = JsonUtility.FromJson<MasterValueIntro>(res);
-                        VideoController.instance.PlayVideo(intro.intro.video);
+                        DataHandler.instance.masterValueIntro = JsonUtility.FromJson<MasterValueIntro>(res);
+                        VideoController.instance.PlayVideo(DataHandler.instance.masterValueIntro.intro.video);
                         loadingPanel.SetActive(false);
                     }));
             });
@@ -309,7 +309,10 @@ public class GameManager : MonoBehaviour
     public void SubmitAnswer()
     {
         questionPanel.SetActive(false);
-        SetupGame();
+        VideoController.instance.PlayVideo(
+            currentQuestion.answers[currentAnswerIndex].video_path,
+            SetupGame, !(currentGameIndex == currentRoleplayQuestions.Count)
+            );
     }
     #endregion
 }

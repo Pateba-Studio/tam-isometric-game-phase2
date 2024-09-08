@@ -4,8 +4,23 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
+    public static AudioManager instance;
     public GameObject muteOnButton;
     public GameObject muteOffButton;
+    public List<AudioSource> audioSources;
+
+    private void Awake()
+    {
+        instance = this;
+    }
+
+    public void SetAudioState(bool cond)
+    {
+        if (cond) audioSources.ForEach(x => x.mute = true);
+
+        if (muteOnButton.activeSelf && !cond)
+            audioSources.ForEach(x => x.mute = false);
+    }
 
     public void SetAudioOn()
     {

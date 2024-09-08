@@ -63,6 +63,7 @@ public class DataHandler : MonoBehaviour
     
     public PlayerData playerData;
     public MasterValue masterValue;
+    public MasterValueIntro masterValueIntro;
 
     [HideInInspector] public bool isPlaying;
 
