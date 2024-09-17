@@ -29,7 +29,8 @@ public class Answer
 {
     public int id;
     public string answer;
-    public string video_path;
+    public string audio_path;
+    public string response_dialogue;
     public int point;
 }
 

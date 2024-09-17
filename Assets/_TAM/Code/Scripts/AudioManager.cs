@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class AudioManager : MonoBehaviour
 {
@@ -46,5 +48,33 @@ public class AudioManager : MonoBehaviour
         {
             item.mute = false;
         };
+    }
+
+    public IEnumerator PlayAudioFromURL(string url, Action events)
+    {
+        using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.MPEG))
+        {
+            yield return request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Failed to load audio: " + request.error);
+            }
+            else
+            {
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(request);
+                audioSources[1].clip = clip;
+                audioSources[1].Play();
+
+                StartCoroutine(CheckIfAudioFinished(events));
+            }
+        }
+    }
+
+    IEnumerator CheckIfAudioFinished(Action OnAudioFinished)
+    {
+        yield return new WaitWhile(() => audioSources[1].isPlaying);
+        GameManager.instance.loadingPanel.SetActive(false);
+        OnAudioFinished?.Invoke();
     }
 }

@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
 
     public void SetMasterValueState(MasterValueHandler handler)
     {
-        GameManager.instance.SetLoadingText("Getting All Booth Data");
+        SetLoadingText("Getting All Booth Data");
         masterValueHandlers.Find(res => res.masterValueHandler == handler).isDone = true;
         if (masterValueHandlers.Any(res => !res.isDone)) return;
 
@@ -308,11 +308,13 @@ public class GameManager : MonoBehaviour
 
     public void SubmitAnswer()
     {
+        loadingPanel.SetActive(true);
         questionPanel.SetActive(false);
-        VideoController.instance.PlayVideo(
-            currentQuestion.answers[currentAnswerIndex].video_path,
-            SetupGame, !(currentGameIndex == currentRoleplayQuestions.Count)
-            );
+        SetLoadingText(currentQuestion.answers[currentAnswerIndex].response_dialogue);
+        StartCoroutine(AudioManager.instance.PlayAudioFromURL(
+            currentQuestion.answers[currentAnswerIndex].audio_path,
+            SetupGame
+            ));
     }
     #endregion
 }
