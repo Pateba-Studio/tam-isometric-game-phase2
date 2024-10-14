@@ -10,11 +10,18 @@ public class PreloadManager : MonoBehaviour
 {
     public static PreloadManager instance;
 
+    public string defaultHall;
     [SerializeField] string defaultUsername;
     [SerializeField] string defaultTicket;
     [SerializeField] string defaultLanguage;
     [SerializeField] string defaultType;
     [SerializeField] string defaultSubMasterValue;
+    [SerializeField] bool defaultHaveSeenTutorial;
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     private void Start()
     {
@@ -24,6 +31,7 @@ public class PreloadManager : MonoBehaviour
             $"\"ticket\":\"{defaultTicket}\"," +
             $"\"sub_master_value_id\":\"{defaultSubMasterValue}\"," +
             $"\"type_elearning\":\"{defaultType}\"," +
+            $"\"have_seen_tutorial\":\"{defaultHaveSeenTutorial}\"," +
             $"\"language\":\"{defaultLanguage}\"}}");
 #else
         DataHandler.instance.playerData.ticket = string.Empty;

@@ -1,14 +1,16 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections;
 using System.Linq;
+
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using TMPro;
+
 using System.Text.RegularExpressions;
 using Assets.SimpleLocalization.Scripts;
-using System.Reflection;
+using TMPro;
+using System.Runtime.CompilerServices;
 
 [Serializable]
 public class CharacterModelData
@@ -55,13 +57,13 @@ public class GameManager : MonoBehaviour
 
     [Header("General UI")]
     public Button interactButton;
+    public Button changeLangButton;
     public GameObject gameCanvas;
     public GameObject charSelectionPanel;
     public GameObject loadingPanel;
     public List<TextMeshProUGUI> loadingText;
 
     [Header("Tutorial UI")]
-    public bool tutorialIsDone;
     public int tutorialIndex;
     public GameObject tutorialPanel;
     public List<GameObject> tutorialPanels;
@@ -82,27 +84,60 @@ public class GameManager : MonoBehaviour
     public List<AnswerButtonData> answerButtons;
     [Space]
     public GameObject resultAnswerPanel;
+    public Button resultAnswerNextButton;
     public TextMeshProUGUI resultAnswerTitleText;
     public TextMeshProUGUI resultAnswerText;
     public TextMeshProUGUI adviceContentText;
 
     [Header("Data List")]
+    public RoleplayQuestion currentRoleplayQuestion;
+    public List<RoleplayQuestion> currentRoleplayQuestions;
     public List<MasterValueHandlerData> masterValueHandlers;
     public List<CharacterModelData> charModels;
     public List<HallData> hallDatas;
+    [HideInInspector] public int currentCharIndex;
 
     int currentGameIndex;
     int currentAnswerIndex;
     int currentDialogueIndex;
-    [HideInInspector] public int currentCharIndex;
 
     HallBoothData currentHallBoothData;
-    RoleplayQuestion currentRoleplayQuestion;
-    List<RoleplayQuestion> currentRoleplayQuestions;
 
     private void Awake()
     {
         instance = this;
+    }
+
+    public void ChangeLanguage()
+    {
+        changeLangButton.interactable = false;
+        switch (DataHandler.instance.playerData.language)
+        {
+            case "en":
+                DataHandler.instance.playerData.language = "id";
+                break;
+            case "id":
+                DataHandler.instance.playerData.language = "en";
+                break;
+        }
+
+        string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
+              $"\"language\":{DataHandler.instance.playerData.language}}}";
+        StartCoroutine(APIManager.instance.PostDataCoroutine(
+            APIManager.instance.SetupChangeLanguage(),
+            json, res =>
+            {
+                changeLangButton.interactable = true;
+                switch (DataHandler.instance.playerData.language)
+                {
+                    case "en":
+                        LocalizationManager.Language = "en-US";
+                        break;
+                    case "id":
+                        LocalizationManager.Language = "id-ID";
+                        break;
+                }
+            }));
     }
 
     public void SetLoadingText(string text)
@@ -120,9 +155,16 @@ public class GameManager : MonoBehaviour
         if (tutorialIndex + index < 0) return;
         if (tutorialIndex + index == tutorialPanels.Count)
         {
-            foreach (var item in tutorialPanels) item.SetActive(false);
-            tutorialPanel.SetActive(false);
-            tutorialIndex = 0;
+            string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"}}";
+            StartCoroutine(APIManager.instance.PostDataCoroutine(
+                APIManager.instance.SetupStoreTutorial(),
+                json, res =>
+                {
+                    DataHandler.instance.playerData.have_seen_tutorial = true;
+                    foreach (var item in tutorialPanels) item.SetActive(false);
+                    tutorialPanel.SetActive(false);
+                    tutorialIndex = 0;
+                }));
         }
         else
         {
@@ -148,7 +190,7 @@ public class GameManager : MonoBehaviour
         if (masterValueHandlers.Any(res => !res.isDone)) return;
 
         loadingPanel.SetActive(false);
-        TeleportHall("MainHall");
+        TeleportHall(PreloadManager.instance.defaultHall);
         OpenCharSelection();
     }
 
@@ -196,12 +238,7 @@ public class GameManager : MonoBehaviour
 
     public void SubmitCharacter()
     {
-        if (!tutorialIsDone)
-        {
-            SetTutorialPanel(0);
-            tutorialIsDone = true;
-        }
-
+        if (!DataHandler.instance.playerData.have_seen_tutorial) SetTutorialPanel(0);
         DataHandler.instance.isPlaying = true;
         charSelectionPanel.SetActive(false);
         gameCanvas.SetActive(true);
@@ -287,7 +324,7 @@ public class GameManager : MonoBehaviour
                     json, res =>
                     {
                         DataHandler.instance.masterValueIntro = JsonUtility.FromJson<MasterValueIntro>(res);
-                        VideoController.instance.PlayVideo(DataHandler.instance.masterValueIntro.intro.video);
+                        VideoController.instance.PlayVideo(0, DataHandler.instance.masterValueIntro.intro.video);
                         loadingPanel.SetActive(false);
                     }));
             });
@@ -355,6 +392,7 @@ public class GameManager : MonoBehaviour
         {
             case "video":
                 VideoController.instance.PlayVideo(
+                    currentRoleplayQuestions[currentGameIndex].id,
                     currentRoleplayQuestions[currentGameIndex].video_path,
                     SetupGame
                     );
@@ -418,19 +456,33 @@ public class GameManager : MonoBehaviour
 
     public void SubmitAnswer()
     {
-        questionPanel.SetActive(false);
-        resultAnswerPanel.SetActive(true);
+        string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
+              $"\"roleplay_question_id\":{currentRoleplayQuestion.id}," +
+              $"\"answer_id\":{currentRoleplayQuestion.question.answers[currentAnswerIndex].id}}}";
+        StartCoroutine(APIManager.instance.PostDataCoroutine(
+            APIManager.instance.SetupSubmitAnswer(),
+            json, res =>
+            {
+                questionPanel.SetActive(false);
+                resultAnswerPanel.SetActive(true);
 
-        resultAnswerPanel.transform.GetChild(0).gameObject.SetActive(true);
-        resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
+                resultAnswerPanel.transform.GetChild(0).gameObject.SetActive(true);
+                resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
 
-        resultAnswerTitleText.text = currentRoleplayQuestion.curr_booth_name;
-        resultAnswerText.text = currentRoleplayQuestion.question.answers[currentAnswerIndex].response_dialogue;
+                resultAnswerTitleText.text = currentRoleplayQuestion.curr_booth_name;
+                resultAnswerText.text = currentRoleplayQuestion.question.answers[currentAnswerIndex].response_dialogue;
 
-        StartCoroutine(AudioManager.instance.PlayAudioFromURL(
-            currentRoleplayQuestion.question.answers[currentAnswerIndex].audio_path,
-            SetupAdvice
-            ));
+                resultAnswerNextButton.interactable = false;
+                resultAnswerNextButton.onClick.RemoveAllListeners();
+                resultAnswerNextButton.onClick.AddListener(SetupAdvice);
+
+                UnityEvent events = new();
+                events.AddListener(() => resultAnswerNextButton.interactable = true);
+                StartCoroutine(AudioManager.instance.PlayAudioFromURL(
+                    currentRoleplayQuestion.question.answers[currentAnswerIndex].audio_path,
+                    events
+                    ));
+            }));
     }
     #endregion
 }

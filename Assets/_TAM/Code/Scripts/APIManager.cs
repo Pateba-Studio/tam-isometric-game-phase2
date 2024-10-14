@@ -16,6 +16,8 @@ public class APIManager : MonoBehaviour
     [SerializeField] string getSubMasterValue = "roleplay/sub-master-value";
     [SerializeField] string getBooth = "roleplay/booths";
     [SerializeField] string getQuestionByBooth = "roleplay/get-questions";
+    [SerializeField] string storeTutorial = "roleplay/store-tutorial";
+    [SerializeField] string changeLanguage = "roleplay/change-language";
     [SerializeField] string submitAnswer = "roleplay/submit-answer";
 
     private void Awake()
@@ -28,18 +30,19 @@ public class APIManager : MonoBehaviour
     public string SetupSubMasterValue() => string.Format("{0}/{1}", rootUrl, getSubMasterValue);
     public string SetupBooth() => string.Format("{0}/{1}", rootUrl, getBooth);
     public string SetupQuestionByBooth() => string.Format("{0}/{1}", rootUrl, getQuestionByBooth);
+    public string SetupStoreTutorial() => string.Format("{0}/{1}", rootUrl, storeTutorial);
+    public string SetupChangeLanguage() => string.Format("{0}/{1}", rootUrl, changeLanguage);
     public string SetupSubmitAnswer() => string.Format("{0}/{1}", rootUrl, submitAnswer);
 
     public IEnumerator PostDataCoroutine(string url, string jsonData, Action<string> SetDataEvent = null)
     {
         yield return new WaitUntil(() => !string.IsNullOrEmpty(DataHandler.instance.GetUserTicket()));
         
-        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         UnityWebRequest request = new UnityWebRequest(url, "POST");
-
-        request.SetRequestHeader("Content-Type", "application/json");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
 
         yield return request.SendWebRequest();
         if (request.result != UnityWebRequest.Result.Success)

@@ -5,24 +5,26 @@ using System.Collections;
 public class VideoController : MonoBehaviour
 {
     public static VideoController instance;
+    public int videoId;
     public bool nextQuestion;
     public bool setupIsDone;
     public bool isDone;
 
-    private UnityAction onVideoEndCallback;
+    UnityAction onVideoEndCallback;
 
     private void Awake()
     {
         instance = this;
     }
 
-    public void PlayVideo(string videoUrl, UnityAction onVideoEnd = null, bool nextQuestion = false)
+    public void PlayVideo(int videoId, string videoUrl, UnityAction onVideoEnd = null, bool nextQuestion = false)
     {
         isDone = false;
         setupIsDone = false;
 
         onVideoEndCallback = onVideoEnd;
         this.nextQuestion = nextQuestion;
+        this.videoId = videoId;
 
         AudioManager.instance.SetAudioState(true);
         Application.ExternalCall("playVideoFromUnity", videoUrl);
@@ -40,9 +42,19 @@ public class VideoController : MonoBehaviour
 
     private IEnumerator CheckForVideoEnd()
     {
-        while (!isDone)
+#if UNITY_EDITOR
+        isDone = true;
+#endif
+        yield return new WaitWhile(() => !isDone);
+
+        if (videoId != 0)
         {
-            yield return null;
+            string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
+              $"\"roleplay_question_id\":{videoId}}}";
+            StartCoroutine(APIManager.instance.PostDataCoroutine(
+                APIManager.instance.SetupSubmitAnswer(),
+                json, res => { }));
+            videoId = 0;
         }
 
         if (nextQuestion)

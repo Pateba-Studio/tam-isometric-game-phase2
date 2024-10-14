@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Networking;
 
 public class AudioManager : MonoBehaviour
@@ -50,7 +51,7 @@ public class AudioManager : MonoBehaviour
         };
     }
 
-    public IEnumerator PlayAudioFromURL(string url, Action events)
+    public IEnumerator PlayAudioFromURL(string url, UnityEvent events)
     {
         using (UnityWebRequest request = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.MPEG))
         {
@@ -71,7 +72,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    IEnumerator CheckIfAudioFinished(Action OnAudioFinished)
+    IEnumerator CheckIfAudioFinished(UnityEvent OnAudioFinished)
     {
         yield return new WaitWhile(() => audioSources[1].isPlaying);
         OnAudioFinished?.Invoke();

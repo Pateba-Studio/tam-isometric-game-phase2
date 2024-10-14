@@ -13,6 +13,7 @@ public class PlayerData
     public string username;
     public string ticket;
     public string sub_master_value_id;
+    public bool have_seen_tutorial;
     public string type_elearning;
     public string language;
 }
