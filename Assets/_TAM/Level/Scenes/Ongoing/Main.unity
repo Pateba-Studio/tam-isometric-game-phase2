@@ -3920,7 +3920,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 792706846}
+  m_Material: {fileID: 1048091158}
   m_Color: {r: 0.38823533, g: 0.3803922, b: 0.8196079, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -16061,9 +16061,9 @@ RectTransform:
   - {fileID: 1453942014}
   m_Father: {fileID: 1171706228}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0}
-  m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 592.59}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: -0.40997314}
   m_SizeDelta: {x: 1309, y: 859}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &761687067
@@ -16794,46 +16794,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 791777583}
   m_CullTransparentMesh: 1
---- !u!21 &792706846
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: UI/RoundedCorners/RoundedCorners
-  m_Shader: {fileID: 4800000, guid: 0bd2ec5d73751e34a814274a454bec41, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _ColorMask: 15
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
-    m_Colors:
-    - _OuterUV: {r: 0, g: 0, b: 1, a: 1}
-    - _WidthHeightRadius: {r: 318.3335, g: 86.42, b: 50, a: 0}
-  m_BuildTextureStacks: []
 --- !u!1 &795048693
 GameObject:
   m_ObjectHideFlags: 0
@@ -22082,6 +22042,46 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_AspectMode: 4
   m_AspectRatio: 1.54
+--- !u!21 &1048091158
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UI/RoundedCorners/RoundedCorners
+  m_Shader: {fileID: 4800000, guid: 0bd2ec5d73751e34a814274a454bec41, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _ColorMask: 15
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
+    m_Colors:
+    - _OuterUV: {r: 0, g: 0, b: 1, a: 1}
+    - _WidthHeightRadius: {r: 318.3335, g: 86.42, b: 50, a: 0}
+  m_BuildTextureStacks: []
 --- !u!1 &1050987220
 GameObject:
   m_ObjectHideFlags: 0
@@ -24512,7 +24512,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1171706228
 RectTransform:
   m_ObjectHideFlags: 0
@@ -27859,19 +27859,15 @@ MonoBehaviour:
   interactButton: {fileID: 1127280479}
   gameCanvas: {fileID: 938872635}
   charSelectionPanel: {fileID: 538985056}
-  hallDatas:
-  - hallKey: MainHall
-    hallObject: {fileID: 908606959}
-    teleportTransform: {fileID: 443535649}
-  - hallKey: PDPHall
-    hallObject: {fileID: 1252565838}
-    teleportTransform: {fileID: 1086749030}
-  - hallKey: ABACHall
-    hallObject: {fileID: 1406422323}
-    teleportTransform: {fileID: 2020136446}
-  - hallKey: COCHall
-    hallObject: {fileID: 405057367}
-    teleportTransform: {fileID: 1557629314}
+  loadingPanel: {fileID: 1617760704}
+  loadingText:
+  - {fileID: 254665418}
+  - {fileID: 1921033640}
+  - {fileID: 2066559096}
+  - {fileID: 207704883}
+  tutorialIsDone: 0
+  tutorialIndex: 0
+  tutorialPanel: {fileID: 565313749}
   tutorialPanels:
   - {fileID: 145771963}
   - {fileID: 799413333}
@@ -27880,15 +27876,6 @@ MonoBehaviour:
   - {fileID: 711161385}
   - {fileID: 1145442717}
   - {fileID: 2019056288}
-  tutorialIndex: 0
-  tutorialPanel: {fileID: 565313749}
-  tutorialIsDone: 0
-  loadingPanel: {fileID: 1617760704}
-  loadingText:
-  - {fileID: 254665418}
-  - {fileID: 1921033640}
-  - {fileID: 2066559096}
-  - {fileID: 207704883}
   dialoguePanel: {fileID: 730863124}
   dialogueTitleText: {fileID: 377870178}
   dialogueContentText: {fileID: 306088479}
@@ -27911,6 +27898,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 2dbcc39ea3fb58e49be75f34f55de7d1, type: 3}
   - {fileID: 21300000, guid: f00ae4c14014ab14085b4642a3a7ff1d, type: 3}
   questionPanel: {fileID: 1996059068}
+  questionOnlyPanel: {fileID: 1625045202}
+  answerOnlyPanel: {fileID: 1171706227}
   questionText: {fileID: 1503533381}
   answerButtons:
   - unselectedBG: {fileID: 643357090}
@@ -27968,6 +27957,19 @@ MonoBehaviour:
   - selectionButton: {fileID: 1774566282}
     showcaseOption: {fileID: 1965689448}
     playerCharacter: {fileID: 1249146627}
+  hallDatas:
+  - hallKey: MainHall
+    hallObject: {fileID: 908606959}
+    teleportTransform: {fileID: 443535649}
+  - hallKey: PDPHall
+    hallObject: {fileID: 1252565838}
+    teleportTransform: {fileID: 1086749030}
+  - hallKey: ABACHall
+    hallObject: {fileID: 1406422323}
+    teleportTransform: {fileID: 2020136446}
+  - hallKey: COCHall
+    hallObject: {fileID: 405057367}
+    teleportTransform: {fileID: 1557629314}
   currentCharIndex: 0
 --- !u!114 &1337584012
 MonoBehaviour:
@@ -29614,7 +29616,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Material: {fileID: 1915465726}
+  m_Material: {fileID: 1824553522}
   m_Color: {r: 0.38823533, g: 0.3803922, b: 0.8196079, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
@@ -35678,6 +35680,46 @@ Transform:
   - {fileID: 949030304}
   m_Father: {fileID: 405057368}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &1824553522
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UI/RoundedCorners/RoundedCorners
+  m_Shader: {fileID: 4800000, guid: 0bd2ec5d73751e34a814274a454bec41, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _ColorMask: 15
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
+    m_Colors:
+    - _OuterUV: {r: 0, g: 0, b: 1, a: 1}
+    - _WidthHeightRadius: {r: 318.3335, g: 86.42, b: 50, a: 0}
+  m_BuildTextureStacks: []
 --- !u!1 &1839912126
 GameObject:
   m_ObjectHideFlags: 0
@@ -37254,46 +37296,6 @@ PolygonCollider2D:
       - {x: -1.8135161, y: 9.007781}
       - {x: -6.1276064, y: 11.517562}
   m_UseDelaunayMesh: 0
---- !u!21 &1915465726
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: UI/RoundedCorners/RoundedCorners
-  m_Shader: {fileID: 4800000, guid: 0bd2ec5d73751e34a814274a454bec41, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _ColorMask: 15
-    - _Stencil: 0
-    - _StencilComp: 8
-    - _StencilOp: 0
-    - _StencilReadMask: 255
-    - _StencilWriteMask: 255
-    - _UseUIAlphaClip: 0
-    m_Colors:
-    - _OuterUV: {r: 0, g: 0, b: 1, a: 1}
-    - _WidthHeightRadius: {r: 318.3335, g: 86.42, b: 50, a: 0}
-  m_BuildTextureStacks: []
 --- !u!1 &1921033638
 GameObject:
   m_ObjectHideFlags: 0

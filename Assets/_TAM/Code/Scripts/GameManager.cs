@@ -57,17 +57,14 @@ public class GameManager : MonoBehaviour
     public Button interactButton;
     public GameObject gameCanvas;
     public GameObject charSelectionPanel;
-    public List<HallData> hallDatas;
-
-    [Header("Tutorial UI")]
-    public List<GameObject> tutorialPanels;
-    public int tutorialIndex;
-    public GameObject tutorialPanel;
-    public bool tutorialIsDone;
-
-    [Header("Loading UI")]
     public GameObject loadingPanel;
     public List<TextMeshProUGUI> loadingText;
+
+    [Header("Tutorial UI")]
+    public bool tutorialIsDone;
+    public int tutorialIndex;
+    public GameObject tutorialPanel;
+    public List<GameObject> tutorialPanels;
 
     [Header("Dialogue Box")]
     public GameObject dialoguePanel;
@@ -79,6 +76,8 @@ public class GameManager : MonoBehaviour
 
     [Header("Question Panel")]
     public GameObject questionPanel;
+    public GameObject questionOnlyPanel;
+    public GameObject answerOnlyPanel;
     public TextMeshProUGUI questionText;
     public List<AnswerButtonData> answerButtons;
     [Space]
@@ -90,6 +89,7 @@ public class GameManager : MonoBehaviour
     [Header("Data List")]
     public List<MasterValueHandlerData> masterValueHandlers;
     public List<CharacterModelData> charModels;
+    public List<HallData> hallDatas;
 
     int currentGameIndex;
     int currentAnswerIndex;
@@ -371,6 +371,8 @@ public class GameManager : MonoBehaviour
     public void SetupQuestion()
     {
         questionPanel.SetActive(true);
+        questionOnlyPanel.SetActive(true);
+        answerOnlyPanel.SetActive(false);
         questionText.text = currentRoleplayQuestion.question.question;
         
         for (int i = 0; i < answerButtons.Count; i++)
