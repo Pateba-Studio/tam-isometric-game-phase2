@@ -100,7 +100,7 @@ public class GameManager : MonoBehaviour
     int currentGameIndex;
     int currentAnswerIndex;
     int currentDialogueIndex;
-
+    bool initLoading;
     HallBoothData currentHallBoothData;
 
     private void Awake()
@@ -189,9 +189,13 @@ public class GameManager : MonoBehaviour
         masterValueHandlers.Find(res => res.masterValueHandler == handler).isDone = true;
         if (masterValueHandlers.Any(res => !res.isDone)) return;
 
-        loadingPanel.SetActive(false);
-        TeleportHall(PreloadManager.instance.defaultHall);
-        OpenCharSelection();
+        if (!initLoading)
+        {
+            initLoading = true;
+            loadingPanel.SetActive(false);
+            TeleportHall(PreloadManager.instance.defaultHall);
+            OpenCharSelection();
+        }
     }
 
     public void OpenCompliancePolicies()
@@ -343,6 +347,7 @@ public class GameManager : MonoBehaviour
     public void SetupRoleplay(HallBoothData data)
     {
         currentGameIndex = 0;
+        currentHallBoothData = data;
         currentRoleplayQuestions = new List<RoleplayQuestion>();
         MasterValueHandler handler = null;
 
@@ -456,6 +461,7 @@ public class GameManager : MonoBehaviour
 
     public void SubmitAnswer()
     {
+        PreloadManager.instance.SetupInitData();
         string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
               $"\"roleplay_question_id\":{currentRoleplayQuestion.id}," +
               $"\"answer_id\":{currentRoleplayQuestion.question.answers[currentAnswerIndex].id}}}";

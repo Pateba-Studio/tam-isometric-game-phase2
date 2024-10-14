@@ -16,9 +16,6 @@ public class GameBoothId
     )]
 public class HallBoothData : ScriptableObject
 {
-    [Header("Hall-Teleport")]
-    public string hallTargetKey;
-
     [Header("Booth-Dialogue")]
     public string NPCCharKey;
     public string titleId;

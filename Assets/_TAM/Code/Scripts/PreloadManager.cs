@@ -44,14 +44,17 @@ public class PreloadManager : MonoBehaviour
         GameManager.instance.SetLoadingText("Getting Local Player Data");
         DataHandler.instance.playerData = JsonUtility.FromJson<PlayerData>(jsonData);
         SetInitLanguage();
+        SetupInitData();
+    }
 
+    public void SetupInitData()
+    {
         string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"}}";
         StartCoroutine(APIManager.instance.PostDataCoroutine(
             APIManager.instance.SetupMasterValue(),
             json, res =>
             {
                 DataHandler.instance.masterValue = JsonUtility.FromJson<MasterValue>(res);
-
                 foreach (var handler in GameManager.instance.masterValueHandlers)
                 {
                     StartCoroutine(handler.masterValueHandler.InitAllBoothValue(

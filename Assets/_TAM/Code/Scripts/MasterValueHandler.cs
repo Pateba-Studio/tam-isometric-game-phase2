@@ -63,13 +63,36 @@ public class QuestionData
 }
 #endregion
 
+#region Booth Status
+[Serializable]
+public class BoothStatusData
+{
+    public int id;
+    public string name;
+    public string checkpoint_status;
+}
+
+[Serializable]
+public class BoothStatus
+{
+    public bool success;
+    public string message;
+    public List<BoothStatusData> booths;
+}
+#endregion
+
 public class MasterValueHandler : MonoBehaviour
 {
+    public List<InteractableHandler> boothsSites;
+
+    [Header("Data Handler")]
     public MasterValueData masterValueData;
+    public BoothStatus boothStatus;
     public Booth booth;
 
     public IEnumerator InitAllBoothValue(List<MasterValueData> data)
     {
+        booth = new Booth();
         GameManager.instance.SetLoadingText("Getting All Hall Data");
         var curr = data.Find(res => res.name.Contains(masterValueData.name));
         if (curr == null) yield break;
@@ -77,21 +100,46 @@ public class MasterValueHandler : MonoBehaviour
 
         string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
             $"\"master_value_id\":{masterValueData.id}}}";
-        StartCoroutine(APIManager.instance.PostDataCoroutine(APIManager.instance.SetupBooth(),
-            json, res => booth = JsonUtility.FromJson<Booth>(res)));
+        StartCoroutine(APIManager.instance.PostDataCoroutine(
+            APIManager.instance.SetupBooth(), json, 
+            res =>
+            { 
+                booth = JsonUtility.FromJson<Booth>(res);
+            }));
+        StartCoroutine(APIManager.instance.PostDataCoroutine(
+            APIManager.instance.SetupBoothStatus(), json, res => 
+            { 
+                boothStatus = JsonUtility.FromJson<BoothStatus>(res);
+            }));
 
         yield return new WaitUntil(() => booth.success);
 
         foreach (var item in booth.booths)
         {
-            json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
+            string boothData = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
                 $"\"booth_id\":{item.id}}}";
-            StartCoroutine(APIManager.instance.PostDataCoroutine(APIManager.instance.SetupQuestionByBooth(),
-                json, res => 
+            StartCoroutine(APIManager.instance.PostDataCoroutine(
+                APIManager.instance.SetupQuestionByBooth(),
+                boothData, res => 
                 {
                     item.question = JsonUtility.FromJson<QuestionData>(res);
                     if (booth.booths.Any(item => !item.question.success)) return;
                     GameManager.instance.SetMasterValueState(this);
+
+                    foreach (var boothTemp in boothsSites)
+                    {
+                        foreach (var id in boothTemp.hallBoothData.GetGameBooth().gameBoothIds)
+                        {
+                            var boothResult = booth.booths.Find(res => res.id == id);
+                            if (boothResult.question.roleplay_questions.Count > 0)
+                            {
+                                boothTemp.SetupBoothClear(false);
+                                break;
+                            }
+
+                            boothTemp.SetupBoothClear(true);
+                        }
+                    }
                 }));
         }
     }

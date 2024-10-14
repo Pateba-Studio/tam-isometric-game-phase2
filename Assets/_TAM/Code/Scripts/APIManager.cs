@@ -16,6 +16,7 @@ public class APIManager : MonoBehaviour
     [SerializeField] string getSubMasterValue = "roleplay/sub-master-value";
     [SerializeField] string getBooth = "roleplay/booths";
     [SerializeField] string getQuestionByBooth = "roleplay/get-questions";
+    [SerializeField] string boothStatus = "roleplay/booths";
     [SerializeField] string storeTutorial = "roleplay/store-tutorial";
     [SerializeField] string changeLanguage = "roleplay/change-language";
     [SerializeField] string submitAnswer = "roleplay/submit-answer";
@@ -30,6 +31,7 @@ public class APIManager : MonoBehaviour
     public string SetupSubMasterValue() => string.Format("{0}/{1}", rootUrl, getSubMasterValue);
     public string SetupBooth() => string.Format("{0}/{1}", rootUrl, getBooth);
     public string SetupQuestionByBooth() => string.Format("{0}/{1}", rootUrl, getQuestionByBooth);
+    public string SetupBoothStatus() => string.Format("{0}/{1}", rootUrl, boothStatus);
     public string SetupStoreTutorial() => string.Format("{0}/{1}", rootUrl, storeTutorial);
     public string SetupChangeLanguage() => string.Format("{0}/{1}", rootUrl, changeLanguage);
     public string SetupSubmitAnswer() => string.Format("{0}/{1}", rootUrl, submitAnswer);
