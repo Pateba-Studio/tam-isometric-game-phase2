@@ -4,13 +4,20 @@ using System.Runtime.InteropServices;
 
 public class PlatformDetector : MonoBehaviour
 {
+    public static PlatformDetector instance;
+
     public bool onDevelopment;
+    public bool isMobilePlatform;
     public UnityEvent WhenMobileUsed;
     public UnityEvent WhenDesktopUsed;
-    bool isMobilePlatform;
 
     [DllImport("__Internal")]
     private static extern bool IsMobile();
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     private void Start()
     {

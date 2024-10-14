@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 34574f0c161eb5f45bf18f603520912b, type: 3}
-  m_Name: 0. PDP All Games
+  m_Name: 0. Main Hall
   m_EditorClassIdentifier: 
+  hallTargetKey: MainHall
   NPCCharKey: 
   titleId: 
   titleEn: 

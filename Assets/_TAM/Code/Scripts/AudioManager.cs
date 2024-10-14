@@ -74,7 +74,6 @@ public class AudioManager : MonoBehaviour
     IEnumerator CheckIfAudioFinished(Action OnAudioFinished)
     {
         yield return new WaitWhile(() => audioSources[1].isPlaying);
-        GameManager.instance.loadingPanel.SetActive(false);
         OnAudioFinished?.Invoke();
     }
 }

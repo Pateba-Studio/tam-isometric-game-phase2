@@ -1,5 +1,13 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+[Serializable]
+public class GameBoothId
+{
+    public GameType gameType;
+    public List<int> gameBoothIds;
+}
 
 [CreateAssetMenu(
     fileName = "Hall and Booth Data", 
@@ -8,6 +16,10 @@ using UnityEngine;
     )]
 public class HallBoothData : ScriptableObject
 {
+    [Header("Hall-Teleport")]
+    public string hallTargetKey;
+
+    [Header("Booth-Dialogue")]
     public string NPCCharKey;
     public string titleId;
     public string titleEn;
@@ -18,5 +30,18 @@ public class HallBoothData : ScriptableObject
 
     [Header("Content-Type")]
     public int masterValueId;
-    public List<int> gameBoothIds;
+    public List<GameBoothId> gameBooths;
+
+    public GameBoothId GetGameBooth()
+    {
+        switch (DataHandler.instance.playerData.type_elearning)
+        {
+            case "default":
+                return gameBooths.Find(res => res.gameType == GameType.Default);
+            case "simple":
+                return gameBooths.Find(res => res.gameType == GameType.Simple);
+            default:
+                return null;
+        }
+    }
 }

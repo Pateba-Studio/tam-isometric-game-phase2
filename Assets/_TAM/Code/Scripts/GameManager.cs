@@ -35,14 +35,37 @@ public class AnswerButtonData
     public TextMeshProUGUI selectedText;
 }
 
+[Serializable]
+public class HallData
+{
+    public string hallKey;
+    public GameObject hallObject;
+    public Transform teleportTransform;
+}
+
+public enum GameType
+{
+    Default, Simple
+}
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
+    public PlayerController playerController;
 
     [Header("General UI")]
     public Button interactButton;
     public GameObject gameCanvas;
     public GameObject charSelectionPanel;
+    public List<HallData> hallDatas;
+
+    [Header("Tutorial UI")]
+    public List<GameObject> tutorialPanels;
+    public int tutorialIndex;
+    public GameObject tutorialPanel;
+    public bool tutorialIsDone;
+
+    [Header("Loading UI")]
     public GameObject loadingPanel;
     public List<TextMeshProUGUI> loadingText;
 
@@ -58,7 +81,11 @@ public class GameManager : MonoBehaviour
     public GameObject questionPanel;
     public TextMeshProUGUI questionText;
     public List<AnswerButtonData> answerButtons;
-    public List<RoleplayQuestion> currentRoleplayQuestions;
+    [Space]
+    public GameObject resultAnswerPanel;
+    public TextMeshProUGUI resultAnswerTitleText;
+    public TextMeshProUGUI resultAnswerText;
+    public TextMeshProUGUI adviceContentText;
 
     [Header("Data List")]
     public List<MasterValueHandlerData> masterValueHandlers;
@@ -66,10 +93,12 @@ public class GameManager : MonoBehaviour
 
     int currentGameIndex;
     int currentAnswerIndex;
-    int currentCharIndex;
     int currentDialogueIndex;
+    [HideInInspector] public int currentCharIndex;
+
     HallBoothData currentHallBoothData;
-    Question currentQuestion;
+    RoleplayQuestion currentRoleplayQuestion;
+    List<RoleplayQuestion> currentRoleplayQuestions;
 
     private void Awake()
     {
@@ -82,6 +111,24 @@ public class GameManager : MonoBehaviour
         {
             var match = Regex.Match(tmp.text, @"\.{1,3}$");
             tmp.text = match.Success ? text + match.Value : text;
+        }
+    }
+
+    public void SetTutorialPanel(int index)
+    {
+        tutorialPanel.SetActive(true);
+        if (tutorialIndex + index < 0) return;
+        if (tutorialIndex + index == tutorialPanels.Count)
+        {
+            foreach (var item in tutorialPanels) item.SetActive(false);
+            tutorialPanel.SetActive(false);
+            tutorialIndex = 0;
+        }
+        else
+        {
+            tutorialIndex += index;
+            foreach (var item in tutorialPanels) item.SetActive(false);
+            tutorialPanels[tutorialIndex].SetActive(true);
         }
     }
 
@@ -101,7 +148,20 @@ public class GameManager : MonoBehaviour
         if (masterValueHandlers.Any(res => !res.isDone)) return;
 
         loadingPanel.SetActive(false);
+        TeleportHall("MainHall");
         OpenCharSelection();
+    }
+
+    public void OpenCompliancePolicies()
+    {
+        string url = "https://s.id/tamSpeech";
+        Application.ExternalEval("window.open('" + url + "', '_blank')");
+    }
+
+    public void AccountLogout()
+    {
+        string url = "https://www.tamconnect.com/logout";
+        Application.ExternalEval("window.open('" + url + "', '_self')");
     }
 
     #region Character Selection
@@ -136,6 +196,12 @@ public class GameManager : MonoBehaviour
 
     public void SubmitCharacter()
     {
+        if (!tutorialIsDone)
+        {
+            SetTutorialPanel(0);
+            tutorialIsDone = true;
+        }
+
         DataHandler.instance.isPlaying = true;
         charSelectionPanel.SetActive(false);
         gameCanvas.SetActive(true);
@@ -143,6 +209,20 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region Hall & Booth System
+    public void TeleportHall(string key)
+    {
+        foreach (var item in hallDatas)
+            item.hallObject.SetActive(false);
+
+        foreach (var target in hallDatas)
+        {
+            if (target.hallKey != key) continue;
+            target.hallObject.SetActive(true);
+            playerController.transform.SetParent(target.teleportTransform.parent);
+            playerController.transform.localPosition = target.teleportTransform.localPosition;
+        }
+    }
+
     public void SetDialogue(bool finalDialogue)
     {
         charImages[0].sprite = charSprites.Find(sprite => sprite.name.Contains(currentHallBoothData.NPCCharKey));
@@ -227,22 +307,32 @@ public class GameManager : MonoBehaviour
     {
         currentGameIndex = 0;
         currentRoleplayQuestions = new List<RoleplayQuestion>();
-        MasterValueHandler handler = new MasterValueHandler();
-        
+        MasterValueHandler handler = null;
+
         foreach (var item in instance.masterValueHandlers)
         {
-            if (item.masterValueHandler.masterValueData.id == data.masterValueId)
+            foreach (var booth in item.masterValueHandler.booth.booths)
             {
-                handler = item.masterValueHandler;
-                break;
+                if (data.GetGameBooth().gameBoothIds.Contains(booth.id))
+                {
+                    handler = item.masterValueHandler;
+                    break;
+                }
             }
+
+            if (handler != null)
+                break;
         }
 
-        foreach (var booth in handler.booth.booths)
+        if (handler != null)
         {
-            foreach (var item in booth.question.roleplay_questions)
+            foreach (var booth in handler.booth.booths)
             {
-                currentRoleplayQuestions.Add(item);
+                foreach (var item in booth.question.roleplay_questions)
+                {
+                    item.curr_booth_name = booth.name;
+                    currentRoleplayQuestions.Add(item);
+                }
             }
         }
 
@@ -251,6 +341,10 @@ public class GameManager : MonoBehaviour
 
     public void SetupGame()
     {
+        resultAnswerPanel.transform.GetChild(0).gameObject.SetActive(false);
+        resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
+        resultAnswerPanel.SetActive(false);
+
         if (currentGameIndex == currentRoleplayQuestions.Count)
         {
             questionPanel.SetActive(false);
@@ -266,7 +360,7 @@ public class GameManager : MonoBehaviour
                     );
                 break;
             case "game_question":
-                currentQuestion = currentRoleplayQuestions[currentGameIndex].question;
+                currentRoleplayQuestion = currentRoleplayQuestions[currentGameIndex];
                 SetupQuestion();
                 break;
         }
@@ -277,14 +371,14 @@ public class GameManager : MonoBehaviour
     public void SetupQuestion()
     {
         questionPanel.SetActive(true);
-        questionText.text = currentQuestion.question;
+        questionText.text = currentRoleplayQuestion.question.question;
         
         for (int i = 0; i < answerButtons.Count; i++)
         {
             answerButtons[i].selectedBG.SetActive(false);
             answerButtons[i].unselectedBG.SetActive(true);
-            answerButtons[i].unselectedText.text = answerButtons[i].selectedText.text = 
-                currentQuestion.answers[i].answer;
+            answerButtons[i].unselectedText.text = answerButtons[i].selectedText.text =
+                currentRoleplayQuestion.question.answers[i].answer;
         }
 
         ChooseAnswer(0);
@@ -306,14 +400,34 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void SetupAdvice()
+    {
+        resultAnswerPanel.transform.GetChild(0).gameObject.SetActive(false);
+        resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
+
+        if (string.IsNullOrEmpty(currentRoleplayQuestion.question.advice)) 
+            SetupGame();
+        else
+        {
+            resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(true);
+            adviceContentText.text = currentRoleplayQuestion.question.advice;
+        }
+    }
+
     public void SubmitAnswer()
     {
-        loadingPanel.SetActive(true);
         questionPanel.SetActive(false);
-        SetLoadingText(currentQuestion.answers[currentAnswerIndex].response_dialogue);
+        resultAnswerPanel.SetActive(true);
+
+        resultAnswerPanel.transform.GetChild(0).gameObject.SetActive(true);
+        resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
+
+        resultAnswerTitleText.text = currentRoleplayQuestion.curr_booth_name;
+        resultAnswerText.text = currentRoleplayQuestion.question.answers[currentAnswerIndex].response_dialogue;
+
         StartCoroutine(AudioManager.instance.PlayAudioFromURL(
-            currentQuestion.answers[currentAnswerIndex].audio_path,
-            SetupGame
+            currentRoleplayQuestion.question.answers[currentAnswerIndex].audio_path,
+            SetupAdvice
             ));
     }
     #endregion

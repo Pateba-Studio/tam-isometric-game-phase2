@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   TableId: 1oKGV_6WA77rOUtiHh9ehLQHNV8DPCmItc9B0xnw5xhE
   Sheets:
-  - Name: Intro
+  - Name: General
     Id: 1005376006
-    TextAsset: {fileID: 4900000, guid: c70c8715f6c46c34e80ff552b31a2ed6, type: 3}
+    TextAsset: {fileID: 4900000, guid: 803d9fbf843cb6a47bc02a4ebe33ea80, type: 3}
+  - Name: Tutorial
+    Id: 2088685907
+    TextAsset: {fileID: 4900000, guid: 5d0ec437ff5583c4ab6f8868a191c0fb, type: 3}
   SaveFolder: {fileID: 102900000, guid: c392831e85f928548b8494fefd912562, type: 3}

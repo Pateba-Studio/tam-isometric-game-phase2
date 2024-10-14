@@ -1,8 +1,17 @@
 Key,id-ID,en-US
 CharSelection.Title,Pilih Karakter Yang Ingin Dimainkan,Select Character You Want To Play
 CharSelection.Submit,Pakai Karakter,Use This Character
+,,
 VisitedBooth.Title,Booth Yang Dikunjungi,Visited Booth
+,,
 Dialogue.Button.Video,Putar Video Intro,Play Intro Video
 Dialogue.Button.Tutorial,Lihat Tutorial,View Tutorial
 Dialogue.Button.Game,Mainkan Minigame,Play Minigames
-Question.Button.Submit,Submit,Pilih
+Dialogue.Title.ResultAnswer,Hasil Jawaban,Result Answer
+,,
+Question.Title,Jawab Pertanyaan,Answer Question
+Question.Button.Open,Buka Jawaban,Open Answer
+Question.Button.Submit,Pilih Jawaban,Submit Answer
+,,
+AfterQuestion.Title,Hasil Jawaban,Result Answer
+AfterQuestion.Understand,"Oke, Mengerti","Alright, Understood"

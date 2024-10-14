@@ -10,16 +10,20 @@ public class PreloadManager : MonoBehaviour
 {
     public static PreloadManager instance;
 
+    [SerializeField] string defaultUsername;
     [SerializeField] string defaultTicket;
     [SerializeField] string defaultLanguage;
+    [SerializeField] string defaultType;
     [SerializeField] string defaultSubMasterValue;
 
     private void Start()
     {
 #if UNITY_EDITOR
         OnLoadPlayerData($"{{\"email\":\"youremail@gmail.com\"," +
+            $"\"username\":\"{defaultUsername}\"," +
             $"\"ticket\":\"{defaultTicket}\"," +
             $"\"sub_master_value_id\":\"{defaultSubMasterValue}\"," +
+            $"\"type_elearning\":\"{defaultType}\"," +
             $"\"language\":\"{defaultLanguage}\"}}");
 #else
         DataHandler.instance.playerData.ticket = string.Empty;

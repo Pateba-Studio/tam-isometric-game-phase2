@@ -18,6 +18,7 @@ public class InteractableHandler : MonoBehaviour
             whenInteract.RemoveAllListeners();
             whenInteract.AddListener(() =>
             {
+                if (isHall) GameManager.instance.TeleportHall(hallBoothData.hallTargetKey);
                 if (isBooth) GameManager.instance.SetupBooth(hallBoothData, true);
                 if (isOnlyGame) GameManager.instance.SetupRoleplay(hallBoothData);
             });

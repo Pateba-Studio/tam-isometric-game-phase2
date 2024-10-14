@@ -39,6 +39,7 @@ public class Question
 {
     public int id;
     public string question;
+    public string advice;
     public List<Answer> answers;
 }
 
@@ -49,6 +50,7 @@ public class RoleplayQuestion
     public string type;
     public int order;
     public string video_path;
+    public string curr_booth_name;
     public Question question;
 }
 

@@ -1,0 +1,28 @@
+Key,id-ID,en-US
+Tutorial.1.Title,"Halo, (username)","Hi, (username)"
+Tutorial.1.Content,Selamat datang (username)! untuk mempermudahkan permainanmu mari saya bantu untuk mengenal lebih dalam terkait permainan,"Welcome, (username)! To make your gameplay easier, let me help you get to know the game in more depth."
+Tutorial.1.Next,Ikuti Tur Permainan,Follow The Game Tour
+Tutorial.2.Desktop.Content,Gerakkan karakter pada komputer/laptop menggunakan tombol WASD atau Arrow Key untuk mengontrol pergerakan karakter,Move the character on your computer or laptop using the WASD keys or the Arrow Keys to control character movement.
+Tutorial.2.Mobile.Content,"Pada perangkat mobile gunakan joystick untuk menggerakan karakter, terletak di kiri bawah","On mobile devices, use the joystick located at the bottom left to move the character."
+Tutorial.3.Content,Setiap tombol memiliki fungsinya masing-masing untuk mendukung jalannya permainan,Each button has its own function to support the gameplay.
+Tutorial.3.Sound.Content,Aktifkan/Non-Aktifkan Audio,Enable/Disable Audio
+Tutorial.3.Language.Content,"Ganti
+Bahasa","Change
+Language"
+Tutorial.3.Character.Content,"Ganti
+Karakter","Change
+Character"
+Tutorial.3.Teleport.Content,"Pindah
+Hall","Switch
+Hall"
+Tutorial.4.Content,Kamu bisa mengakses “Lihat Misi” untuk mengetahui pekerjaan apa yang harus kamu lakukan,You can access “Mission” to see what tasks you need to complete.
+Tutorial.5.Content,"Pantau terus progress perkembangan pekerjaanmu pada 1 Hall, selesaikan untuk lanjut ke Hall berikutnya","Keep track of your task progress in each Hall, and complete it to move on to the next Hall."
+Tutorial.6.Content,Lihat lebih lanjut mengenai Compliance Policy dan keluar dari game jika tidak memungkinkan untuk lanjut bermain,Learn more about the Compliance Policy and exit the game if you are unable to continue playing.
+Tutorial.7.Title,"MANTAB, HEBAT SEKALI!","AWESOME, GREAT JOB!"
+Tutorial.7.Content,"Kamu telah menyelesaikan tutorial permainan,
+selamat mengerjakan TAM Compliance 2024","You have completed the game tutorial,
+good luck with TAM Compliance 2024!"
+,,
+Tutorial.Done,Selesai,Done
+Tutorial.Next,Lanjutkan,Next
+Tutorial.Back,Kembali,Back

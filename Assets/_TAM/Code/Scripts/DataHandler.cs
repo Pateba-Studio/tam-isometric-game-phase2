@@ -10,8 +10,10 @@ using UnityEngine;
 public class PlayerData
 {
     public string email;
+    public string username;
     public string ticket;
     public string sub_master_value_id;
+    public string type_elearning;
     public string language;
 }
 
@@ -73,4 +75,5 @@ public class DataHandler : MonoBehaviour
     }
 
     public string GetUserTicket() => playerData.ticket;
+    public string GetUsername() => playerData.username;
 }
