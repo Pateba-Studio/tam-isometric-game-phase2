@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class InteractableHandler : MonoBehaviour
 {
@@ -10,10 +11,13 @@ public class InteractableHandler : MonoBehaviour
     [Header("Hall Attributes")]
     public string hallTargetKey;
 
-    [Header("Game-Booth Attributes")]
+    [Header("Booth Attributes")]
+    public int boothIndex;
+    public Image boothCheck;
     public GameObject boothOngoing;
     public GameObject boothIsDone;
-    public List<GameBoothId> gameBooths;
+    public GameObject missionOngoing;
+    public GameObject missionIsDone;
 
     [Header("Conditional State")]
     public bool isHall;
@@ -26,12 +30,20 @@ public class InteractableHandler : MonoBehaviour
     {
         if (clear)
         {
+            boothCheck.sprite = GameManager.instance.boothCheckDatas[boothIndex].boothCheckDone;
             GameManager.instance.SetupInteractButton(false, null);
             GetComponent<PolygonCollider2D>().enabled = false;
         }
+        else
+        {
+            boothCheck.sprite = GameManager.instance.boothCheckDatas[boothIndex].boothCheckUndone;
+        }
 
         boothOngoing.SetActive(!clear);
+        missionOngoing.SetActive(clear);
+
         boothIsDone.SetActive(clear);
+        missionIsDone.SetActive(!clear);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

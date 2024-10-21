@@ -40,6 +40,7 @@ public class Question
     public int id;
     public string question;
     public string advice;
+    public string background;
     public List<Answer> answers;
 }
 
@@ -63,37 +64,18 @@ public class QuestionData
 }
 #endregion
 
-#region Booth Status
-[Serializable]
-public class BoothStatusData
-{
-    public int id;
-    public string name;
-    public string checkpoint_status;
-}
-
-[Serializable]
-public class BoothStatus
-{
-    public bool success;
-    public string message;
-    public List<BoothStatusData> booths;
-}
-#endregion
-
 public class MasterValueHandler : MonoBehaviour
 {
     public List<InteractableHandler> boothsSites;
 
     [Header("Data Handler")]
     public MasterValueData masterValueData;
-    public BoothStatus boothStatus;
     public Booth booth;
 
     public IEnumerator InitAllBoothValue(List<MasterValueData> data)
     {
         booth = new Booth();
-        GameManager.instance.SetLoadingText("Getting All Hall Data");
+        //GameManager.instance.SetLoadingText("Getting All Hall Data");
         var curr = data.Find(res => res.name.Contains(masterValueData.name));
         if (curr == null) yield break;
         masterValueData = curr;
@@ -105,11 +87,6 @@ public class MasterValueHandler : MonoBehaviour
             res =>
             { 
                 booth = JsonUtility.FromJson<Booth>(res);
-            }));
-        StartCoroutine(APIManager.instance.PostDataCoroutine(
-            APIManager.instance.SetupBoothStatus(), json, res => 
-            { 
-                boothStatus = JsonUtility.FromJson<BoothStatus>(res);
             }));
 
         yield return new WaitUntil(() => booth.success);

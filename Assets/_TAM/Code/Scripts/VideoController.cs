@@ -45,10 +45,12 @@ public class VideoController : MonoBehaviour
 #if UNITY_EDITOR
         isDone = true;
 #endif
+
         yield return new WaitWhile(() => !isDone);
 
         if (videoId != 0)
         {
+            PreloadManager.instance.SetupInitData();
             string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
               $"\"roleplay_question_id\":{videoId}}}";
             StartCoroutine(APIManager.instance.PostDataCoroutine(
@@ -59,7 +61,7 @@ public class VideoController : MonoBehaviour
 
         if (nextQuestion)
         {
-            GameManager.instance.SetLoadingText("Please Wait For Next Question");
+            //GameManager.instance.SetLoadingText("Please Wait For Next Question");
             GameManager.instance.loadingPanel.SetActive(true);
             yield return new WaitForSeconds(2.5f);
             GameManager.instance.loadingPanel.SetActive(false);

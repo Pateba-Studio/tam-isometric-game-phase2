@@ -41,7 +41,7 @@ public class PreloadManager : MonoBehaviour
 
     void OnLoadPlayerData(string jsonData)
     {
-        GameManager.instance.SetLoadingText("Getting Local Player Data");
+        //GameManager.instance.SetLoadingText("Getting Local Player Data");
         DataHandler.instance.playerData = JsonUtility.FromJson<PlayerData>(jsonData);
         SetInitLanguage();
         SetupInitData();

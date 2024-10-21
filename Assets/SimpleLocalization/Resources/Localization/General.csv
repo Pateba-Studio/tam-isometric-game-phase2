@@ -15,3 +15,32 @@ Question.Button.Submit,Pilih Jawaban,Submit Answer
 ,,
 AfterQuestion.Title,Hasil Jawaban,Result Answer
 AfterQuestion.Understand,"Oke, Mengerti","Alright, Understood"
+,,
+Mission.Title,Misi Dalam Game,In Game Mission
+Mission.Resepsionis.Title,"Kunjungi Booth Resepsionis 
+di Main Hall","Visit the Reception Booth 
+in the Main Hall"
+Mission.Resepsionis.Description,Kunjungi Booth Resepsionis di Main Hall untuk mendapatkan informasi penting dan melanjutkan progres permainan,Visit the Reception Booth in the Main Hall to get important information and continue game progress
+Mission.Personal Data Collecting & Transferring.Title,"Kunjungi Booth Personal Data Collecting & 
+Transferring di PDP Hall","Visit the Personal Data Collecting & 
+Transferring Booth in the PDP Hall"
+Mission.Personal Data Collecting & Transferring.Description,Kunjungi Booth Personal Data Collecting & Transferring di PDP Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Personal Data Collecting & Transferring Booth in the PDP Hall to continue and complete game progress
+Mission.Prohibition of Bribery.Title,"Kunjungi Booth Prohibition of Bribery 
+di ABAC Hall","Visit the Prohibition of Bribery Booth 
+in the ABAC Hall"
+Mission.Prohibition of Bribery.Description,Kunjungi Booth Prohibition of Bribery di ABAC Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Prohibition of Bribery Booth in the ABAC Hall to continue and complete game progress
+Mission.Conflict of Interest.Title,"Kunjungi Booth Conflict of Interest 
+di ABAC Hall","Visit the Conflict of Interest Booth 
+in the ABAC Hall"
+Mission.Conflict of Interest.Description,Kunjungi Booth Conflict of Interest di ABAC Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Conflict of Interest Booth in the ABAC Hall to continue and complete game progress
+Mission.Work Ethics & Business Ethics.Title,"Kunjungi Booth Work Ethics & 
+Business Ethics di COC Hall","Visit the Work Ethics & 
+Business Ethics Booth in the COC Hall"
+Mission.Work Ethics & Business Ethics.Description,Kunjungi Booth Work Ethics & Business Ethics di COC Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Work Ethics & Business Ethics Booth in the COC Hall to continue and complete game progress
+Mission.Respect Human Right & Speak Up.Title,"Kunjungi Booth Respect Human Right & 
+Speak Up di COC Hall","Visit the Respect Human Rights & 
+Speak Up Booth in the COC Hall"
+Mission.Respect Human Right & Speak Up.Description,Kunjungi Booth Respect Human Right & Speak Up di COC Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Respect Human Rights & Speak Up Booth in the COC Hall to continue and complete game progress
+,,
+Teleportation.Title,Pilih Hall untuk Teleportasi kesana,Select a Hall to Teleport there
+Teleportation.Submit,Teleportasi,Teleport

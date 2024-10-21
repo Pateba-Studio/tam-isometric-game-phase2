@@ -10,7 +10,7 @@ using UnityEngine.UI;
 using System.Text.RegularExpressions;
 using Assets.SimpleLocalization.Scripts;
 using TMPro;
-using System.Runtime.CompilerServices;
+using System.Security.Cryptography;
 
 [Serializable]
 public class CharacterModelData
@@ -41,8 +41,18 @@ public class AnswerButtonData
 public class HallData
 {
     public string hallKey;
+    public GameObject missionList;
+    public GameObject boothCheckpoint;
     public GameObject hallObject;
+    [Space]
     public Transform teleportTransform;
+}
+
+[Serializable]
+public class BoothCheckData
+{
+    public Sprite boothCheckDone;
+    public Sprite boothCheckUndone;
 }
 
 public enum GameType
@@ -80,7 +90,8 @@ public class GameManager : MonoBehaviour
     public GameObject questionPanel;
     public GameObject questionOnlyPanel;
     public GameObject answerOnlyPanel;
-    public TextMeshProUGUI questionText;
+    public List<Image> questionBackgrounds;
+    public List<TextMeshProUGUI> questionText;
     public List<AnswerButtonData> answerButtons;
     [Space]
     public GameObject resultAnswerPanel;
@@ -89,18 +100,23 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI resultAnswerText;
     public TextMeshProUGUI adviceContentText;
 
+    [Header("Hall & Booth Attributes")]
+    public GameObject boothCheckpointParent;
+    public List<BoothCheckData> boothCheckDatas;
+    public List<HallData> hallDatas;
+
     [Header("Data List")]
     public RoleplayQuestion currentRoleplayQuestion;
     public List<RoleplayQuestion> currentRoleplayQuestions;
     public List<MasterValueHandlerData> masterValueHandlers;
     public List<CharacterModelData> charModels;
-    public List<HallData> hallDatas;
     [HideInInspector] public int currentCharIndex;
 
     int currentGameIndex;
     int currentAnswerIndex;
     int currentDialogueIndex;
     bool initLoading;
+    string teleportTarget;
     HallBoothData currentHallBoothData;
 
     private void Awake()
@@ -108,6 +124,7 @@ public class GameManager : MonoBehaviour
         instance = this;
     }
 
+    #region General
     public void ChangeLanguage()
     {
         changeLangButton.interactable = false;
@@ -185,7 +202,7 @@ public class GameManager : MonoBehaviour
 
     public void SetMasterValueState(MasterValueHandler handler)
     {
-        SetLoadingText("Getting All Booth Data");
+        //SetLoadingText("Getting All Booth Data");
         masterValueHandlers.Find(res => res.masterValueHandler == handler).isDone = true;
         if (masterValueHandlers.Any(res => !res.isDone)) return;
 
@@ -209,6 +226,7 @@ public class GameManager : MonoBehaviour
         string url = "https://www.tamconnect.com/logout";
         Application.ExternalEval("window.open('" + url + "', '_self')");
     }
+    #endregion
 
     #region Character Selection
     public void OpenCharSelection()
@@ -249,16 +267,41 @@ public class GameManager : MonoBehaviour
     }
     #endregion
 
+    #region
+    public void SetTeleportTarget(string target)
+    {
+        teleportTarget = target;
+    }
+
+    public void SubmitTeleportTarget()
+    {
+        TeleportHall(teleportTarget);
+    }
+    #endregion
+
     #region Hall & Booth System
     public void TeleportHall(string key)
     {
         foreach (var item in hallDatas)
+        {
             item.hallObject.SetActive(false);
+            if (item.boothCheckpoint != null) 
+                item.boothCheckpoint.SetActive(false);
+        }
 
         foreach (var target in hallDatas)
         {
             if (target.hallKey != key) continue;
             target.hallObject.SetActive(true);
+
+            if (key == "Main") 
+                boothCheckpointParent.SetActive(false);
+            else
+            {
+                target.boothCheckpoint.SetActive(true);
+                boothCheckpointParent.SetActive(true); 
+            }
+
             playerController.transform.SetParent(target.teleportTransform.parent);
             playerController.transform.localPosition = target.teleportTransform.localPosition;
         }
@@ -307,10 +350,10 @@ public class GameManager : MonoBehaviour
         dialogueButtons.ForEach(button =>
         {
             button.onClick.RemoveAllListeners();
-            if (currentDialogueIndex == currentHallBoothData.contentId.Count)
-                button.gameObject.SetActive(true);
-            else
-                button.gameObject.SetActive(false);
+            //if (currentDialogueIndex == currentHallBoothData.contentId.Count)
+            //    button.gameObject.SetActive(true);
+            //else
+            //    button.gameObject.SetActive(false);
         });
 
         if (currentDialogueIndex == currentHallBoothData.contentId.Count)
@@ -321,8 +364,8 @@ public class GameManager : MonoBehaviour
                 string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
                               $"\"master_value_id\":{currentHallBoothData.masterValueId}}}";
 
-                SetLoadingText("Getting Video");
-                loadingPanel.SetActive(true);
+                //SetLoadingText("Getting Video");
+                //loadingPanel.SetActive(true);
                 StartCoroutine(APIManager.instance.PostDataCoroutine(
                     APIManager.instance.SetupMasterValueIntro(),
                     json, res =>
@@ -383,8 +426,8 @@ public class GameManager : MonoBehaviour
 
     public void SetupGame()
     {
-        resultAnswerPanel.transform.GetChild(0).gameObject.SetActive(false);
         resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
+        resultAnswerPanel.transform.GetChild(2).gameObject.SetActive(false);
         resultAnswerPanel.SetActive(false);
 
         if (currentGameIndex == currentRoleplayQuestions.Count)
@@ -414,10 +457,33 @@ public class GameManager : MonoBehaviour
     public void SetupQuestion()
     {
         questionPanel.SetActive(true);
+        loadingPanel.SetActive(true);
+        SetLoadingText("Please Wait");
+
+        if (!string.IsNullOrEmpty(currentRoleplayQuestion.question.background))
+        {
+            StartCoroutine(
+                APIManager.instance.DownloadImageCoroutine(
+                    currentRoleplayQuestion.question.background, res =>
+                    {
+                        AfterDownloadQuestionBackground(res);
+                    }));
+        }
+        else
+        {
+            AfterDownloadQuestionBackground(null);
+        }
+    }
+
+    public void AfterDownloadQuestionBackground(Sprite sprite)
+    {
+        if (sprite != null) questionBackgrounds.ForEach(a => a.sprite = sprite);
+        questionText.ForEach(text => text.text = currentRoleplayQuestion.question.question);
+
+        loadingPanel.SetActive(false);
         questionOnlyPanel.SetActive(true);
         answerOnlyPanel.SetActive(false);
-        questionText.text = currentRoleplayQuestion.question.question;
-        
+
         for (int i = 0; i < answerButtons.Count; i++)
         {
             answerButtons[i].selectedBG.SetActive(false);
@@ -447,14 +513,16 @@ public class GameManager : MonoBehaviour
 
     public void SetupAdvice()
     {
-        resultAnswerPanel.transform.GetChild(0).gameObject.SetActive(false);
-        resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
-
-        if (string.IsNullOrEmpty(currentRoleplayQuestion.question.advice)) 
+        if (string.IsNullOrEmpty(currentRoleplayQuestion.question.advice))
+        {
+            Debug.Log("Setup Game");
             SetupGame();
+        }
         else
         {
-            resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(true);
+            Debug.Log("Setup Advice");
+            resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
+            resultAnswerPanel.transform.GetChild(2).gameObject.SetActive(true);
             adviceContentText.text = currentRoleplayQuestion.question.advice;
         }
     }
@@ -472,15 +540,12 @@ public class GameManager : MonoBehaviour
                 questionPanel.SetActive(false);
                 resultAnswerPanel.SetActive(true);
 
-                resultAnswerPanel.transform.GetChild(0).gameObject.SetActive(true);
-                resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
-
-                resultAnswerTitleText.text = currentRoleplayQuestion.curr_booth_name;
-                resultAnswerText.text = currentRoleplayQuestion.question.answers[currentAnswerIndex].response_dialogue;
+                resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(true);
+                resultAnswerPanel.transform.GetChild(2).gameObject.SetActive(false);
 
                 resultAnswerNextButton.interactable = false;
-                resultAnswerNextButton.onClick.RemoveAllListeners();
-                resultAnswerNextButton.onClick.AddListener(SetupAdvice);
+                resultAnswerTitleText.text = currentRoleplayQuestion.curr_booth_name;
+                resultAnswerText.text = currentRoleplayQuestion.question.answers[currentAnswerIndex].response_dialogue;
 
                 UnityEvent events = new();
                 events.AddListener(() => resultAnswerNextButton.interactable = true);

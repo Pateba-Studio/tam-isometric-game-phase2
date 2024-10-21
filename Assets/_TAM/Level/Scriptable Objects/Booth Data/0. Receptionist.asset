@@ -18,12 +18,18 @@ MonoBehaviour:
   finalContentId: Selamat datang, silahkan dipilih layanan<br>dari booth kami...
   finalContentEn: Welcome, please choose the service<br>from our booth...
   contentId:
-  - Contoh Dialogue (1)
-  - Contoh Dialogue (2)
-  - Contoh Dialogue (3)
+  - Halo! Selamat Datang di E - Learning TAM 2024
+  - Wahh Keren
+  - Ada yang bisa kami bantu?
+  - Saya baru pertama kali masuk ke dalam E - Learning ini, saya ingin mempelajari
+    lebih dalam dan memulai berbagai aktivitas dan game yang ada
+  - Wah menarik sekali! Yuk kita mulai!
   contentEn:
-  - Dialogue Example (1)
-  - Dialogue Example (2)
-  - Dialogue Example (3)
+  - Hello! Welcome to E - Learning TAM 2024
+  - Wow, that's cool
+  - Can I help you?
+  - This is my first time entering E-Learning, I want to learn more and start various
+    activities and games available.
+  - Wow, that's interesting! Let's get started!
   masterValueId: 27
-  boothIds: 
+  gameBooths: []
