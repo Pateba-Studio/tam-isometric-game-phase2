@@ -40,10 +40,10 @@ public class InteractableHandler : MonoBehaviour
         }
 
         boothOngoing.SetActive(!clear);
-        missionOngoing.SetActive(clear);
+        missionOngoing.SetActive(!clear);
 
         boothIsDone.SetActive(clear);
-        missionIsDone.SetActive(!clear);
+        missionIsDone.SetActive(clear);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

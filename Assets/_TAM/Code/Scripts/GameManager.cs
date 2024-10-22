@@ -138,8 +138,8 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
-              $"\"language\":{DataHandler.instance.playerData.language}}}";
+        string json = $"\"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
+                      $"\"language\":\"{DataHandler.instance.playerData.language}\"}}\"";
         StartCoroutine(APIManager.instance.PostDataCoroutine(
             APIManager.instance.SetupChangeLanguage(),
             json, res =>
@@ -225,6 +225,71 @@ public class GameManager : MonoBehaviour
     {
         string url = "https://www.tamconnect.com/logout";
         Application.ExternalEval("window.open('" + url + "', '_self')");
+    }
+
+    public static string ConvertHTMLToTMPRO(string htmlText)
+    {
+        // Mengonversi <b> dan </b> menjadi <b> dan </b> yang didukung oleh TMP
+        htmlText = Regex.Replace(htmlText, @"<b>", "<b>");
+        htmlText = Regex.Replace(htmlText, @"</b>", "</b>");
+
+        // Mengonversi <i> dan </i> menjadi <i> dan </i> yang didukung oleh TMP
+        htmlText = Regex.Replace(htmlText, @"<i>", "<i>");
+        htmlText = Regex.Replace(htmlText, @"</i>", "</i>");
+
+        // Mengonversi <u> dan </u> menjadi <u> dan </u> yang didukung oleh TMP
+        htmlText = Regex.Replace(htmlText, @"<u>", "<u>");
+        htmlText = Regex.Replace(htmlText, @"</u>", "</u>");
+
+        // Mengonversi tag <color> dan </color>
+        htmlText = Regex.Replace(htmlText, @"<color=(.*?)>", "<color=$1>");
+        htmlText = Regex.Replace(htmlText, @"</color>", "</color>");
+
+        // Mengonversi <br> menjadi baris baru \n yang didukung oleh TMP
+        htmlText = Regex.Replace(htmlText, @"<br\s*/?>", "\n");
+
+        // Mengonversi <p> dan </p> menjadi \n yang didukung oleh TMP
+        htmlText = Regex.Replace(htmlText, @"<p>", "");
+        htmlText = Regex.Replace(htmlText, @"</p>", "\n");
+
+        // Mengonversi <ol> menjadi baris kosong di awal (untuk keteraturan list)
+        htmlText = Regex.Replace(htmlText, @"<ol>", "");
+        htmlText = Regex.Replace(htmlText, @"</ol>", "\n");
+
+        // Mengonversi <ul> menjadi baris kosong di awal (untuk keteraturan list)
+        htmlText = Regex.Replace(htmlText, @"<ul>", "");
+        htmlText = Regex.Replace(htmlText, @"</ul>", "\n");
+
+        // Mengonversi <li> menjadi bullet point atau nomor manual
+        htmlText = Regex.Replace(htmlText, @"<li>", "• ");
+        htmlText = Regex.Replace(htmlText, @"</li>", "\n");
+
+        // Mengonversi <span> menjadi tag <color> atau format lain yang diperlukan
+        htmlText = Regex.Replace(htmlText, @"<span.*?>", ""); // Menghilangkan tag <span> tanpa properti
+        htmlText = Regex.Replace(htmlText, @"</span>", "");
+
+        // Mengonversi <h1> sampai <h6> menjadi size yang lebih besar
+        htmlText = Regex.Replace(htmlText, @"<h1>", "<size=150%>");
+        htmlText = Regex.Replace(htmlText, @"</h1>", "</size>\n");
+        htmlText = Regex.Replace(htmlText, @"<h2>", "<size=140%>");
+        htmlText = Regex.Replace(htmlText, @"</h2>", "</size>\n");
+        htmlText = Regex.Replace(htmlText, @"<h3>", "<size=130%>");
+        htmlText = Regex.Replace(htmlText, @"</h3>", "</size>\n");
+        htmlText = Regex.Replace(htmlText, @"<h4>", "<size=120%>");
+        htmlText = Regex.Replace(htmlText, @"</h4>", "</size>\n");
+        htmlText = Regex.Replace(htmlText, @"<h5>", "<size=110%>");
+        htmlText = Regex.Replace(htmlText, @"</h5>", "</size>\n");
+        htmlText = Regex.Replace(htmlText, @"<h6>", "<size=100%>");
+        htmlText = Regex.Replace(htmlText, @"</h6>", "</size>\n");
+
+        // Mengonversi <a href> menjadi teks biasa, karena TMP tidak mendukung link HTML langsung
+        htmlText = Regex.Replace(htmlText, @"<a\s+href=[""'](.*?)[""'].*?>", "");
+        htmlText = Regex.Replace(htmlText, @"</a>", "");
+
+        // Menghapus semua tag HTML lainnya yang tidak didukung oleh TMP
+        htmlText = Regex.Replace(htmlText, @"<[^>]+>", "");
+
+        return htmlText;
     }
     #endregion
 
@@ -523,7 +588,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Setup Advice");
             resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
             resultAnswerPanel.transform.GetChild(2).gameObject.SetActive(true);
-            adviceContentText.text = currentRoleplayQuestion.question.advice;
+            adviceContentText.text = ConvertHTMLToTMPRO(currentRoleplayQuestion.question.advice);
         }
     }
 
@@ -545,7 +610,8 @@ public class GameManager : MonoBehaviour
 
                 resultAnswerNextButton.interactable = false;
                 resultAnswerTitleText.text = currentRoleplayQuestion.curr_booth_name;
-                resultAnswerText.text = currentRoleplayQuestion.question.answers[currentAnswerIndex].response_dialogue;
+                resultAnswerText.text = ConvertHTMLToTMPRO(currentRoleplayQuestion.
+                    question.answers[currentAnswerIndex].response_dialogue);
 
                 UnityEvent events = new();
                 events.AddListener(() => resultAnswerNextButton.interactable = true);
