@@ -1,6 +1,7 @@
 Key,id-ID,en-US
 CharSelection.Title,Pilih Karakter Yang Ingin Dimainkan,Select Character You Want To Play
 CharSelection.Submit,Pakai Karakter,Use This Character
+Compliance.Submit,"Saya Mengerti, Lanjutkan","I Understand, Continue"
 ,,
 VisitedBooth.Title,Booth Yang Dikunjungi,Visited Booth
 ,,
@@ -37,10 +38,10 @@ Mission.Work Ethics & Business Ethics.Title,"Kunjungi Booth Work Ethics &
 Business Ethics di COC Hall","Visit the Work Ethics & 
 Business Ethics Booth in the COC Hall"
 Mission.Work Ethics & Business Ethics.Description,Kunjungi Booth Work Ethics & Business Ethics di COC Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Work Ethics & Business Ethics Booth in the COC Hall to continue and complete game progress
-Mission.Respect Human Right & Speak Up.Title,"Kunjungi Booth Respect Human Right & 
-Speak Up di COC Hall","Visit the Respect Human Rights & 
+Mission.Business Competition & Speak Up.Title,"Kunjungi Booth Business Competition & 
+Speak Up di COC Hall","Visit the Respect Business Competition &
 Speak Up Booth in the COC Hall"
-Mission.Respect Human Right & Speak Up.Description,Kunjungi Booth Respect Human Right & Speak Up di COC Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Respect Human Rights & Speak Up Booth in the COC Hall to continue and complete game progress
+Mission.Business Competition & Speak Up.Description,Kunjungi Booth Business Competition & Speak Up di COC Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Respect Business Competition & Speak Up Booth in the COC Hall to continue and complete game progress
 ,,
 Teleportation.Title,Pilih Hall untuk Teleportasi kesana,Select a Hall to Teleport there
 Teleportation.Submit,Teleportasi,Teleport

@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using Assets.SimpleLocalization.Scripts;
 using TMPro;
 using System.Security.Cryptography;
+using LogicUI.FancyTextRendering;
 
 [Serializable]
 public class CharacterModelData
@@ -97,8 +98,8 @@ public class GameManager : MonoBehaviour
     public GameObject resultAnswerPanel;
     public Button resultAnswerNextButton;
     public TextMeshProUGUI resultAnswerTitleText;
-    public TextMeshProUGUI resultAnswerText;
-    public TextMeshProUGUI adviceContentText;
+    public MarkdownRenderer resultAnswerText;
+    public MarkdownRenderer adviceContentText;
 
     [Header("Hall & Booth Attributes")]
     public GameObject boothCheckpointParent;
@@ -138,8 +139,8 @@ public class GameManager : MonoBehaviour
                 break;
         }
 
-        string json = $"\"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
-                      $"\"language\":\"{DataHandler.instance.playerData.language}\"}}\"";
+        string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
+              $"\"language\":\"{DataHandler.instance.playerData.language}\"}}";
         StartCoroutine(APIManager.instance.PostDataCoroutine(
             APIManager.instance.SetupChangeLanguage(),
             json, res =>
@@ -177,8 +178,12 @@ public class GameManager : MonoBehaviour
                 APIManager.instance.SetupStoreTutorial(),
                 json, res =>
                 {
+                    OpenCharSelection();
                     DataHandler.instance.playerData.have_seen_tutorial = true;
-                    foreach (var item in tutorialPanels) item.SetActive(false);
+
+                    foreach (var item in tutorialPanels) 
+                        item.SetActive(false);
+                    
                     tutorialPanel.SetActive(false);
                     tutorialIndex = 0;
                 }));
@@ -211,7 +216,9 @@ public class GameManager : MonoBehaviour
             initLoading = true;
             loadingPanel.SetActive(false);
             TeleportHall(PreloadManager.instance.defaultHall);
-            OpenCharSelection();
+
+            if (!DataHandler.instance.playerData.have_seen_tutorial) SetTutorialPanel(0);
+            else OpenCharSelection();
         }
     }
 
@@ -227,69 +234,46 @@ public class GameManager : MonoBehaviour
         Application.ExternalEval("window.open('" + url + "', '_self')");
     }
 
-    public static string ConvertHTMLToTMPRO(string htmlText)
+    public string ConvertHTMLToTMPRO(string htmlText)
     {
-        // Mengonversi <b> dan </b> menjadi <b> dan </b> yang didukung oleh TMP
-        htmlText = Regex.Replace(htmlText, @"<b>", "<b>");
-        htmlText = Regex.Replace(htmlText, @"</b>", "</b>");
+        // Mengganti tag HTML dengan tag TMP yang kompatibel
+        string tmpString = htmlText;
 
-        // Mengonversi <i> dan </i> menjadi <i> dan </i> yang didukung oleh TMP
-        htmlText = Regex.Replace(htmlText, @"<i>", "<i>");
-        htmlText = Regex.Replace(htmlText, @"</i>", "</i>");
+        // Handle bold, italic, underline, color, size
+        tmpString = tmpString.Replace("<b>", "<b>").Replace("</b>", "</b>");
+        tmpString = tmpString.Replace("<i>", "<i>").Replace("</i>", "</i>");
+        tmpString = tmpString.Replace("<u>", "<u>").Replace("</u>", "</u>");
+        tmpString = tmpString.Replace("<color=", "<color=").Replace("</color>", "</color>");
+        tmpString = tmpString.Replace("<size=", "<size=").Replace("</size>", "</size>");
 
-        // Mengonversi <u> dan </u> menjadi <u> dan </u> yang didukung oleh TMP
-        htmlText = Regex.Replace(htmlText, @"<u>", "<u>");
-        htmlText = Regex.Replace(htmlText, @"</u>", "</u>");
+        // Mengganti <br> dengan newline
+        tmpString = tmpString.Replace("<br>", "\n").Replace("<br/>", "\n");
 
-        // Mengonversi tag <color> dan </color>
-        htmlText = Regex.Replace(htmlText, @"<color=(.*?)>", "<color=$1>");
-        htmlText = Regex.Replace(htmlText, @"</color>", "</color>");
+        // Mengganti tag <p> dengan newline
+        tmpString = tmpString.Replace("<p>", "\n").Replace("</p>", "\n");
 
-        // Mengonversi <br> menjadi baris baru \n yang didukung oleh TMP
-        htmlText = Regex.Replace(htmlText, @"<br\s*/?>", "\n");
+        // Mengganti tag heading dengan format persentase ukuran yang sesuai untuk TMP
+        tmpString = tmpString.Replace("<h1>", "<size=150%><b>").Replace("</h1>", "</b></size>\n");
+        tmpString = tmpString.Replace("<h2>", "<size=140%><b>").Replace("</h2>", "</b></size>\n");
+        tmpString = tmpString.Replace("<h3>", "<size=130%><b>").Replace("</h3>", "</b></size>\n");
+        tmpString = tmpString.Replace("<h4>", "<size=120%><b>").Replace("</h4>", "</b></size>\n");
+        tmpString = tmpString.Replace("<h5>", "<size=110%><b>").Replace("</h5>", "</b></size>\n");
+        tmpString = tmpString.Replace("<h6>", "<size=100%><b>").Replace("</h6>", "</b></size>\n");
 
-        // Mengonversi <p> dan </p> menjadi \n yang didukung oleh TMP
-        htmlText = Regex.Replace(htmlText, @"<p>", "");
-        htmlText = Regex.Replace(htmlText, @"</p>", "\n");
+        // Mengganti <ol> dengan new line untuk ordered list
+        tmpString = tmpString.Replace("<ol>", "\n").Replace("</ol>", "\n");
 
-        // Mengonversi <ol> menjadi baris kosong di awal (untuk keteraturan list)
-        htmlText = Regex.Replace(htmlText, @"<ol>", "");
-        htmlText = Regex.Replace(htmlText, @"</ol>", "\n");
+        // Mengganti <ul> dengan new line untuk unordered list
+        tmpString = tmpString.Replace("<ul>", "\n").Replace("</ul>", "\n");
 
-        // Mengonversi <ul> menjadi baris kosong di awal (untuk keteraturan list)
-        htmlText = Regex.Replace(htmlText, @"<ul>", "");
-        htmlText = Regex.Replace(htmlText, @"</ul>", "\n");
+        // Mengganti <li> untuk list item, unordered list dengan bullet points
+        tmpString = tmpString.Replace("<li>", "• ").Replace("</li>", "\n");
 
-        // Mengonversi <li> menjadi bullet point atau nomor manual
-        htmlText = Regex.Replace(htmlText, @"<li>", "• ");
-        htmlText = Regex.Replace(htmlText, @"</li>", "\n");
+        // Penanganan tag <span> khusus untuk atribut warna di dalam style
+        tmpString = Regex.Replace(tmpString, @"<span[^>]*style=['""]?color:\s*(#[0-9A-Fa-f]{3,6}|[a-zA-Z]+)['""]?[^>]*>", "<color=$1>");
+        tmpString = tmpString.Replace("</span>", "</color>");
 
-        // Mengonversi <span> menjadi tag <color> atau format lain yang diperlukan
-        htmlText = Regex.Replace(htmlText, @"<span.*?>", ""); // Menghilangkan tag <span> tanpa properti
-        htmlText = Regex.Replace(htmlText, @"</span>", "");
-
-        // Mengonversi <h1> sampai <h6> menjadi size yang lebih besar
-        htmlText = Regex.Replace(htmlText, @"<h1>", "<size=150%>");
-        htmlText = Regex.Replace(htmlText, @"</h1>", "</size>\n");
-        htmlText = Regex.Replace(htmlText, @"<h2>", "<size=140%>");
-        htmlText = Regex.Replace(htmlText, @"</h2>", "</size>\n");
-        htmlText = Regex.Replace(htmlText, @"<h3>", "<size=130%>");
-        htmlText = Regex.Replace(htmlText, @"</h3>", "</size>\n");
-        htmlText = Regex.Replace(htmlText, @"<h4>", "<size=120%>");
-        htmlText = Regex.Replace(htmlText, @"</h4>", "</size>\n");
-        htmlText = Regex.Replace(htmlText, @"<h5>", "<size=110%>");
-        htmlText = Regex.Replace(htmlText, @"</h5>", "</size>\n");
-        htmlText = Regex.Replace(htmlText, @"<h6>", "<size=100%>");
-        htmlText = Regex.Replace(htmlText, @"</h6>", "</size>\n");
-
-        // Mengonversi <a href> menjadi teks biasa, karena TMP tidak mendukung link HTML langsung
-        htmlText = Regex.Replace(htmlText, @"<a\s+href=[""'](.*?)[""'].*?>", "");
-        htmlText = Regex.Replace(htmlText, @"</a>", "");
-
-        // Menghapus semua tag HTML lainnya yang tidak didukung oleh TMP
-        htmlText = Regex.Replace(htmlText, @"<[^>]+>", "");
-
-        return htmlText;
+        return tmpString;
     }
     #endregion
 
@@ -325,7 +309,6 @@ public class GameManager : MonoBehaviour
 
     public void SubmitCharacter()
     {
-        if (!DataHandler.instance.playerData.have_seen_tutorial) SetTutorialPanel(0);
         DataHandler.instance.isPlaying = true;
         charSelectionPanel.SetActive(false);
         gameCanvas.SetActive(true);
@@ -357,15 +340,10 @@ public class GameManager : MonoBehaviour
         foreach (var target in hallDatas)
         {
             if (target.hallKey != key) continue;
-            target.hallObject.SetActive(true);
 
-            if (key == "Main") 
-                boothCheckpointParent.SetActive(false);
-            else
-            {
-                target.boothCheckpoint.SetActive(true);
-                boothCheckpointParent.SetActive(true); 
-            }
+            target.hallObject.SetActive(true);
+            target.boothCheckpoint.SetActive(true);
+            boothCheckpointParent.SetActive(true);
 
             playerController.transform.SetParent(target.teleportTransform.parent);
             playerController.transform.localPosition = target.teleportTransform.localPosition;
@@ -415,10 +393,10 @@ public class GameManager : MonoBehaviour
         dialogueButtons.ForEach(button =>
         {
             button.onClick.RemoveAllListeners();
-            //if (currentDialogueIndex == currentHallBoothData.contentId.Count)
-            //    button.gameObject.SetActive(true);
-            //else
-            //    button.gameObject.SetActive(false);
+            if (currentDialogueIndex == currentHallBoothData.contentId.Count)
+                button.gameObject.SetActive(true);
+            else
+                button.gameObject.SetActive(false);
         });
 
         if (currentDialogueIndex == currentHallBoothData.contentId.Count)
@@ -437,7 +415,7 @@ public class GameManager : MonoBehaviour
                     {
                         DataHandler.instance.masterValueIntro = JsonUtility.FromJson<MasterValueIntro>(res);
                         VideoController.instance.PlayVideo(0, DataHandler.instance.masterValueIntro.intro.video);
-                        loadingPanel.SetActive(false);
+                        //loadingPanel.SetActive(false);
                     }));
             });
         }
@@ -588,7 +566,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Setup Advice");
             resultAnswerPanel.transform.GetChild(1).gameObject.SetActive(false);
             resultAnswerPanel.transform.GetChild(2).gameObject.SetActive(true);
-            adviceContentText.text = ConvertHTMLToTMPRO(currentRoleplayQuestion.question.advice);
+            adviceContentText.Source = currentRoleplayQuestion.question.advice;
         }
     }
 
@@ -610,8 +588,8 @@ public class GameManager : MonoBehaviour
 
                 resultAnswerNextButton.interactable = false;
                 resultAnswerTitleText.text = currentRoleplayQuestion.curr_booth_name;
-                resultAnswerText.text = ConvertHTMLToTMPRO(currentRoleplayQuestion.
-                    question.answers[currentAnswerIndex].response_dialogue);
+                resultAnswerText.Source = currentRoleplayQuestion.
+                    question.answers[currentAnswerIndex].response_dialogue;
 
                 UnityEvent events = new();
                 events.AddListener(() => resultAnswerNextButton.interactable = true);
