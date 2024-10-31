@@ -6,7 +6,6 @@ public class VideoController : MonoBehaviour
 {
     public static VideoController instance;
     public int videoId;
-    public bool nextQuestion;
     public bool setupIsDone;
     public bool isDone;
 
@@ -17,13 +16,12 @@ public class VideoController : MonoBehaviour
         instance = this;
     }
 
-    public void PlayVideo(int videoId, string videoUrl, UnityAction onVideoEnd = null, bool nextQuestion = false)
+    public void PlayVideo(int videoId, string videoUrl, UnityAction onVideoEnd = null)
     {
         isDone = false;
         setupIsDone = false;
 
         onVideoEndCallback = onVideoEnd;
-        this.nextQuestion = nextQuestion;
         this.videoId = videoId;
 
         AudioManager.instance.SetAudioState(true);
@@ -48,28 +46,25 @@ public class VideoController : MonoBehaviour
 
         yield return new WaitWhile(() => !isDone);
 
-        if (videoId != 0)
+        UnityEvent events = new();
+        events.AddListener(delegate
         {
-            PreloadManager.instance.SetupInitData();
-            string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
-              $"\"roleplay_question_id\":{videoId}}}";
-            StartCoroutine(APIManager.instance.PostDataCoroutine(
-                APIManager.instance.SetupSubmitAnswer(),
-                json, res => { }));
-            videoId = 0;
-        }
+            if (videoId != 0)
+            {
+                string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
+                  $"\"roleplay_question_id\":{videoId}}}";
+                StartCoroutine(APIManager.instance.PostDataCoroutine(
+                    APIManager.instance.SetupSubmitAnswer(),
+                    json, res => { }));
+                videoId = 0;
+            }
 
-        if (nextQuestion)
-        {
-            //GameManager.instance.SetLoadingText("Please Wait For Next Question");
-            GameManager.instance.loadingPanel.SetActive(true);
-            yield return new WaitForSeconds(2.5f);
-            GameManager.instance.loadingPanel.SetActive(false);
-        }
+            AudioManager.instance.SetAudioState(false);
+            onVideoEndCallback?.Invoke();
+            setupIsDone = false;
+            isDone = false;
+        });
 
-        AudioManager.instance.SetAudioState(false);
-        onVideoEndCallback?.Invoke();
-        setupIsDone = false;
-        isDone = false;
+        GameManager.instance.UpdateCurrentBooth(events);
     }
 }

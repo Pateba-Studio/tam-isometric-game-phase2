@@ -6,7 +6,7 @@ using UnityEngine;
 public class GameBoothId
 {
     public GameType gameType;
-    public List<int> gameBoothIds;
+    public int gameBoothId;
 }
 
 [CreateAssetMenu(
@@ -25,7 +25,7 @@ public class HallBoothData : ScriptableObject
     [TextArea] public List<string> contentId;
     [TextArea] public List<string> contentEn;
 
-    [Header("Content-Type")]
+    [Header("Game-Booth")]
     public int masterValueId;
     public List<GameBoothId> gameBooths;
 

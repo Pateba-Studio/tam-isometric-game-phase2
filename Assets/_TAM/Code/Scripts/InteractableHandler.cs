@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -41,9 +42,10 @@ public class InteractableHandler : MonoBehaviour
 
         boothOngoing.SetActive(!clear);
         missionOngoing.SetActive(!clear);
-
         boothIsDone.SetActive(clear);
         missionIsDone.SetActive(clear);
+
+        GameManager.instance.MissionChecker();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

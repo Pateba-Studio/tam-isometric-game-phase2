@@ -26,10 +26,10 @@ Mission.Personal Data Collecting & Transferring.Title,"Kunjungi Booth Personal D
 Transferring di PDP Hall","Visit the Personal Data Collecting & 
 Transferring Booth in the PDP Hall"
 Mission.Personal Data Collecting & Transferring.Description,Kunjungi Booth Personal Data Collecting & Transferring di PDP Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Personal Data Collecting & Transferring Booth in the PDP Hall to continue and complete game progress
-Mission.Prohibition of Bribery.Title,"Kunjungi Booth Prohibition of Bribery 
-di ABAC Hall","Visit the Prohibition of Bribery Booth 
+Mission.Prohibition on Bribery.Title,"Kunjungi Booth Prohibition on Bribery 
+di ABAC Hall","Visit the Prohibition on Bribery Booth 
 in the ABAC Hall"
-Mission.Prohibition of Bribery.Description,Kunjungi Booth Prohibition of Bribery di ABAC Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Prohibition of Bribery Booth in the ABAC Hall to continue and complete game progress
+Mission.Prohibition on Bribery.Description,Kunjungi Booth Prohibition on Bribery di ABAC Hall untuk melanjutkan dan menyelesaikan progres permainan,Visit the Prohibition on Bribery Booth in the ABAC Hall to continue and complete game progress
 Mission.Conflict of Interest.Title,"Kunjungi Booth Conflict of Interest 
 di ABAC Hall","Visit the Conflict of Interest Booth 
 in the ABAC Hall"
@@ -45,3 +45,5 @@ Mission.Business Competition & Speak Up.Description,Kunjungi Booth Business Comp
 ,,
 Teleportation.Title,Pilih Hall untuk Teleportasi kesana,Select a Hall to Teleport there
 Teleportation.Submit,Teleportasi,Teleport
+,,
+GameOver.Content,Anda telah menyelesaikan seluruh rangkaian E-Learning Assessment 2024. Semangat Anda luar biasa untuk menyelesaikan hingga tahap akhir. Terima kasih atas partisipasi dan dedikasinya TAM Family.,"You have completed the entire E-Learning Assessment 2024 series. Your enthusiasm and dedication to reach the final stage are truly outstanding. Thank you for your participation and commitment, TAM Family."

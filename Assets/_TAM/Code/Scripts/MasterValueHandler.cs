@@ -83,9 +83,9 @@ public class MasterValueHandler : MonoBehaviour
         string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
             $"\"master_value_id\":{masterValueData.id}}}";
         StartCoroutine(APIManager.instance.PostDataCoroutine(
-            APIManager.instance.SetupBooth(), json, 
+            APIManager.instance.SetupBooth(), json,
             res =>
-            { 
+            {
                 booth = JsonUtility.FromJson<Booth>(res);
             }));
 
@@ -97,7 +97,7 @@ public class MasterValueHandler : MonoBehaviour
                 $"\"booth_id\":{item.id}}}";
             StartCoroutine(APIManager.instance.PostDataCoroutine(
                 APIManager.instance.SetupQuestionByBooth(),
-                boothData, res => 
+                boothData, res =>
                 {
                     item.question = JsonUtility.FromJson<QuestionData>(res);
                     if (booth.booths.Any(item => !item.question.success)) return;
@@ -105,19 +105,48 @@ public class MasterValueHandler : MonoBehaviour
 
                     foreach (var boothTemp in boothsSites)
                     {
-                        foreach (var id in boothTemp.hallBoothData.GetGameBooth().gameBoothIds)
+                        int id = boothTemp.hallBoothData.GetGameBooth().gameBoothId;
+                        if (item.id == id)
                         {
-                            var boothResult = booth.booths.Find(res => res.id == id);
-                            if (boothResult.question.roleplay_questions.Count > 0)
+                            if (item.question.roleplay_questions.Count > 0)
                             {
                                 boothTemp.SetupBoothClear(false);
-                                break;
                             }
-
-                            boothTemp.SetupBoothClear(true);
+                            else
+                            {
+                                boothTemp.SetupBoothClear(true);
+                            }
                         }
                     }
                 }));
         }
+    }
+
+    public IEnumerator InitBoothValue(UnityEvent events)
+    {
+        string boothName = GameManager.instance.currentRoleplayQuestion.curr_booth_name;
+        var item = booth.booths.Find(booth => booth.name == boothName);
+        if (item == null) yield break;
+
+        foreach (var boothTemp in boothsSites)
+        {
+            int id = boothTemp.hallBoothData.GetGameBooth().gameBoothId;
+            if (item.id == id)
+            {
+                item.question.roleplay_questions.RemoveAt(0);
+                if (item.question.roleplay_questions.Count > 0)
+                {
+                    boothTemp.SetupBoothClear(false);
+                }
+                else
+                {
+                    boothTemp.SetupBoothClear(true);
+                }
+
+                break;
+            }
+        }
+
+        events?.Invoke();
     }
 }

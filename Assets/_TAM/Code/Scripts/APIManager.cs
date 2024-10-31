@@ -146,35 +146,23 @@ public class APIManager : MonoBehaviour
 
     public IEnumerator DownloadImageCoroutine(string imageUrl, Action<Sprite> SetDataEvent = null)
     {
-        // Wait until the user ticket is not empty
         yield return new WaitUntil(() => !string.IsNullOrEmpty(DataHandler.instance.GetUserTicket()));
-
-        // Start the web request
         using UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl);
-
-        // Send the request and wait for the response
         yield return request.SendWebRequest();
 
-        // Check for errors
         if (request.result != UnityWebRequest.Result.Success)
         {
             Debug.LogError("Error downloading image: " + request.error);
         }
         else
         {
-            print("Image Downloaded");
-
-            // Get the downloaded texture
             Texture2D texture = DownloadHandlerTexture.GetContent(request);
-
-            // Create a sprite from the texture
             Sprite sprite = Sprite.Create(
                 texture,
                 new Rect(0, 0, texture.width, texture.height),
                 new Vector2(0.5f, 0.5f)
             );
 
-            // Assign the sprite to the target image
             SetDataEvent(sprite);
         }
     }

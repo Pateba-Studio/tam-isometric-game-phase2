@@ -12,7 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34574f0c161eb5f45bf18f603520912b, type: 3}
   m_Name: 1. ABAC - Prohibition of Bribery
   m_EditorClassIdentifier: 
-  hallTargetKey: 
   NPCCharKey: Receptionist
   titleId: Resepsionis
   titleEn: Receptionist
@@ -29,6 +28,6 @@ MonoBehaviour:
   masterValueId: 27
   gameBooths:
   - gameType: 0
-    gameBoothIds: 0a000000
+    gameBoothId: 10
   - gameType: 1
-    gameBoothIds: 02000000
+    gameBoothId: 2
