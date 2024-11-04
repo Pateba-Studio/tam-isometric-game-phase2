@@ -7,6 +7,11 @@ public class PlatformObject : MonoBehaviour
     public GameObject objectMobile;
     public GameObject objectDesktop;
 
+    private void OnEnable()
+    {
+        Check();
+    }
+
     public void Start()
     {
         Check();

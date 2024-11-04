@@ -24,6 +24,7 @@ public class InteractableHandler : MonoBehaviour
     public bool isHall;
     public bool isBooth;
     public bool isOnlyGame;
+    public bool isDone;
 
     [HideInInspector] public UnityEvent whenInteract;
 
@@ -40,6 +41,7 @@ public class InteractableHandler : MonoBehaviour
             boothCheck.sprite = GameManager.instance.boothCheckDatas[boothIndex].boothCheckUndone;
         }
 
+        isDone = clear;
         boothOngoing.SetActive(!clear);
         missionOngoing.SetActive(!clear);
         boothIsDone.SetActive(clear);

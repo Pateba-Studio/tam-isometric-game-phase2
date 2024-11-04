@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.Linq;
 
 using UnityEngine;
@@ -10,7 +9,6 @@ using UnityEngine.UI;
 using System.Text.RegularExpressions;
 using Assets.SimpleLocalization.Scripts;
 using TMPro;
-using System.Security.Cryptography;
 using LogicUI.FancyTextRendering;
 
 [Serializable]
@@ -42,7 +40,6 @@ public class AnswerButtonData
 public class HallData
 {
     public string hallKey;
-    public GameObject missionList;
     public GameObject boothCheckpoint;
     public GameObject hallObject;
     [Space]
@@ -54,6 +51,19 @@ public class BoothCheckData
 {
     public Sprite boothCheckDone;
     public Sprite boothCheckUndone;
+}
+
+[Serializable]
+public class HallBooth
+{
+    public HallType hallType;
+    public List<InteractableHandler> boothInteractables;
+    public UnityEvent whenAllBoothDone;
+}
+
+public enum HallType
+{
+    Main, PDP, ABAC, COC
 }
 
 public enum GameType
@@ -90,7 +100,6 @@ public class GameManager : MonoBehaviour
 
     [Header("Question Panel")]
     public GameObject questionPanel;
-    public GameObject questionOnlyPanel;
     public GameObject answerOnlyPanel;
     public List<Image> questionBackgrounds;
     public List<TextMeshProUGUI> questionText;
@@ -104,8 +113,9 @@ public class GameManager : MonoBehaviour
 
     [Header("Hall & Booth Attributes")]
     public GameObject boothCheckpointParent;
-    public List<BoothCheckData> boothCheckDatas;
     public List<HallData> hallDatas;
+    public List<BoothCheckData> boothCheckDatas;
+    public List<HallBooth> hallBoothDatas;
     public List<InteractableHandler> gameBoothDatas;
 
     [Header("Data List")]
@@ -119,6 +129,7 @@ public class GameManager : MonoBehaviour
     int currentAnswerIndex;
     int currentDialogueIndex;
     bool initLoading;
+    bool characterChosen;
     string teleportTarget;
     HallBoothData currentHallBoothData;
 
@@ -137,7 +148,16 @@ public class GameManager : MonoBehaviour
 
     public void MissionChecker()
     {
-        gameOverPanel.SetActive(gameBoothDatas.Find(game => !game.missionIsDone.activeSelf) == null);
+        gameOverPanel.SetActive(gameBoothDatas.
+            Find(game => !game.missionIsDone.activeSelf) == null);
+
+        foreach (var item in hallBoothDatas)
+        {
+            if (item.boothInteractables.Find(booth => !booth.isDone) == null)
+            {
+                item.whenAllBoothDone.Invoke();
+            }
+        }
     }
 
     #region General
@@ -160,6 +180,8 @@ public class GameManager : MonoBehaviour
             APIManager.instance.SetupChangeLanguage(),
             json, res =>
             {
+                Debug.Log(json);
+                Debug.Log(res);
                 changeLangButton.interactable = true;
                 switch (DataHandler.instance.playerData.language)
                 {
@@ -193,7 +215,7 @@ public class GameManager : MonoBehaviour
                 APIManager.instance.SetupStoreTutorial(),
                 json, res =>
                 {
-                    if (!initLoading) OpenCharSelection();
+                    if (!characterChosen) OpenCharSelection();
                     DataHandler.instance.playerData.have_seen_tutorial = true;
 
                     foreach (var item in tutorialPanels) 
@@ -255,48 +277,6 @@ public class GameManager : MonoBehaviour
         string url = "https://www.tamconnect.com/logout";
         Application.ExternalEval("window.open('" + url + "', '_self')");
     }
-
-    public string ConvertHTMLToTMPRO(string htmlText)
-    {
-        // Mengganti tag HTML dengan tag TMP yang kompatibel
-        string tmpString = htmlText;
-
-        // Handle bold, italic, underline, color, size
-        tmpString = tmpString.Replace("<b>", "<b>").Replace("</b>", "</b>");
-        tmpString = tmpString.Replace("<i>", "<i>").Replace("</i>", "</i>");
-        tmpString = tmpString.Replace("<u>", "<u>").Replace("</u>", "</u>");
-        tmpString = tmpString.Replace("<color=", "<color=").Replace("</color>", "</color>");
-        tmpString = tmpString.Replace("<size=", "<size=").Replace("</size>", "</size>");
-
-        // Mengganti <br> dengan newline
-        tmpString = tmpString.Replace("<br>", "\n").Replace("<br/>", "\n");
-
-        // Mengganti tag <p> dengan newline
-        tmpString = tmpString.Replace("<p>", "\n").Replace("</p>", "\n");
-
-        // Mengganti tag heading dengan format persentase ukuran yang sesuai untuk TMP
-        tmpString = tmpString.Replace("<h1>", "<size=150%><b>").Replace("</h1>", "</b></size>\n");
-        tmpString = tmpString.Replace("<h2>", "<size=140%><b>").Replace("</h2>", "</b></size>\n");
-        tmpString = tmpString.Replace("<h3>", "<size=130%><b>").Replace("</h3>", "</b></size>\n");
-        tmpString = tmpString.Replace("<h4>", "<size=120%><b>").Replace("</h4>", "</b></size>\n");
-        tmpString = tmpString.Replace("<h5>", "<size=110%><b>").Replace("</h5>", "</b></size>\n");
-        tmpString = tmpString.Replace("<h6>", "<size=100%><b>").Replace("</h6>", "</b></size>\n");
-
-        // Mengganti <ol> dengan new line untuk ordered list
-        tmpString = tmpString.Replace("<ol>", "\n").Replace("</ol>", "\n");
-
-        // Mengganti <ul> dengan new line untuk unordered list
-        tmpString = tmpString.Replace("<ul>", "\n").Replace("</ul>", "\n");
-
-        // Mengganti <li> untuk list item, unordered list dengan bullet points
-        tmpString = tmpString.Replace("<li>", "• ").Replace("</li>", "\n");
-
-        // Penanganan tag <span> khusus untuk atribut warna di dalam style
-        tmpString = Regex.Replace(tmpString, @"<span[^>]*style=['""]?color:\s*(#[0-9A-Fa-f]{3,6}|[a-zA-Z]+)['""]?[^>]*>", "<color=$1>");
-        tmpString = tmpString.Replace("</span>", "</color>");
-
-        return tmpString;
-    }
     #endregion
 
     #region Character Selection
@@ -331,6 +311,7 @@ public class GameManager : MonoBehaviour
 
     public void SubmitCharacter()
     {
+        characterChosen = true;
         DataHandler.instance.isPlaying = true;
         charSelectionPanel.SetActive(false);
         gamePanel.SetActive(true);
@@ -364,8 +345,15 @@ public class GameManager : MonoBehaviour
             if (target.hallKey != key) continue;
 
             target.hallObject.SetActive(true);
-            target.boothCheckpoint.SetActive(true);
-            boothCheckpointParent.SetActive(true);
+            if (target.boothCheckpoint != null)
+            {
+                boothCheckpointParent.SetActive(true);
+                target.boothCheckpoint.SetActive(true);
+            }
+            else
+            {
+                boothCheckpointParent.SetActive(false);
+            }
 
             playerController.transform.SetParent(target.teleportTransform.parent);
             playerController.transform.localPosition = target.teleportTransform.localPosition;
@@ -424,22 +412,22 @@ public class GameManager : MonoBehaviour
         if (currentDialogueIndex == currentHallBoothData.contentId.Count)
         {
             SetDialogue(true);
-            dialogueButtons[0].onClick.AddListener(() =>
-            {
-                string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
-                              $"\"master_value_id\":{currentHallBoothData.masterValueId}}}";
+            //dialogueButtons[0].onClick.AddListener(() =>
+            //{
+            //    string json = $"{{\"ticket_number\":\"{DataHandler.instance.GetUserTicket()}\"," +
+            //                  $"\"master_value_id\":{currentHallBoothData.masterValueId}}}";
 
-                //SetLoadingText("Getting Video");
-                //loadingPanel.SetActive(true);
-                StartCoroutine(APIManager.instance.PostDataCoroutine(
-                    APIManager.instance.SetupMasterValueIntro(),
-                    json, res =>
-                    {
-                        DataHandler.instance.masterValueIntro = JsonUtility.FromJson<MasterValueIntro>(res);
-                        VideoController.instance.PlayVideo(0, DataHandler.instance.masterValueIntro.intro.video);
-                        //loadingPanel.SetActive(false);
-                    }));
-            });
+            //    //SetLoadingText("Getting Video");
+            //    //loadingPanel.SetActive(true);
+            //    StartCoroutine(APIManager.instance.PostDataCoroutine(
+            //        APIManager.instance.SetupMasterValueIntro(),
+            //        json, res =>
+            //        {
+            //            DataHandler.instance.masterValueIntro = JsonUtility.FromJson<MasterValueIntro>(res);
+            //            VideoController.instance.PlayVideo(0, DataHandler.instance.masterValueIntro.intro.video);
+            //            //loadingPanel.SetActive(false);
+            //        }));
+            //});
         }
         else if (currentDialogueIndex < currentHallBoothData.contentId.Count)
         {
@@ -539,7 +527,6 @@ public class GameManager : MonoBehaviour
         questionText.ForEach(text => text.text = currentRoleplayQuestion.question.question);
 
         loadingPanel.SetActive(false);
-        questionOnlyPanel.SetActive(true);
         answerOnlyPanel.SetActive(false);
 
         for (int i = 0; i < answerButtons.Count; i++)
@@ -608,10 +595,15 @@ public class GameManager : MonoBehaviour
 
                     UnityEvent events = new();
                     events.AddListener(() => resultAnswerNextButton.interactable = true);
+
+#if UNITY_EDITOR
+                    events.Invoke();
+#else
                     StartCoroutine(AudioManager.instance.PlayAudioFromURL(
                         currentRoleplayQuestion.question.answers[currentAnswerIndex].audio_path,
                         events
                         ));
+#endif
                 }));
         });
 

@@ -97,28 +97,29 @@ public class MasterValueHandler : MonoBehaviour
                 $"\"booth_id\":{item.id}}}";
             StartCoroutine(APIManager.instance.PostDataCoroutine(
                 APIManager.instance.SetupQuestionByBooth(),
-                boothData, res =>
-                {
-                    item.question = JsonUtility.FromJson<QuestionData>(res);
-                    if (booth.booths.Any(item => !item.question.success)) return;
-                    GameManager.instance.SetMasterValueState(this);
+                boothData, res => item.question = JsonUtility.FromJson<QuestionData>(res)));
+        }
 
-                    foreach (var boothTemp in boothsSites)
+        yield return new WaitUntil(() => booth.booths.Find(res => !res.question.success) == null);
+
+        GameManager.instance.SetMasterValueState(this);
+        foreach (var item in booth.booths)
+        {
+            foreach (var boothTemp in boothsSites)
+            {
+                int id = boothTemp.hallBoothData.GetGameBooth().gameBoothId;
+                if (item.id == id)
+                {
+                    if (item.question.roleplay_questions.Count > 0)
                     {
-                        int id = boothTemp.hallBoothData.GetGameBooth().gameBoothId;
-                        if (item.id == id)
-                        {
-                            if (item.question.roleplay_questions.Count > 0)
-                            {
-                                boothTemp.SetupBoothClear(false);
-                            }
-                            else
-                            {
-                                boothTemp.SetupBoothClear(true);
-                            }
-                        }
+                        boothTemp.SetupBoothClear(false);
                     }
-                }));
+                    else
+                    {
+                        boothTemp.SetupBoothClear(true);
+                    }
+                }
+            }
         }
     }
 
